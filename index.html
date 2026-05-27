@@ -250,10 +250,13 @@
         }
 
         .hero-3d-logo {
-            width: 100px;
-            height: 100px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
             border: 4px solid var(--secondary);
             transform: translateZ(30px); /* Efecto popout */
             box-shadow: 0 8px 20px rgba(0,0,0,0.6);
@@ -265,8 +268,10 @@
             width: 170px;
             height: 170px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transform: translateZ(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateZ(35px); /* Por encima del logotipo */
+            z-index: 6;
+            pointer-events: none;
         }
 
         .hero-3d-groove-2 {
@@ -274,8 +279,10 @@
             width: 140px;
             height: 140px;
             border-radius: 50%;
-            border: 1px dashed rgba(255, 255, 255, 0.04);
-            transform: translateZ(18px);
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            transform: translateZ(38px); /* Por encima del logotipo */
+            z-index: 7;
+            pointer-events: none;
         }
 
         /* --- CATEGORY SELECTOR (OPTIMIZADO PARA MOVIMIENTO TÁCTIL) --- */
@@ -609,8 +616,7 @@
             box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(25px);
             z-index: 310;
-            transform: translateX(100%);
-            display: none; /* Inicialmente oculto */
+            display: none; /* Inicialmente oculto y animado por GSAP */
             flex-direction: column;
         }
 
@@ -975,10 +981,6 @@
                 width: 170px;
                 height: 170px;
             }
-            .hero-3d-logo {
-                width: 75px;
-                height: 75px;
-            }
             .section-title {
                 font-size: 1.35rem;
                 margin: 2rem 0 1rem;
@@ -999,7 +1001,6 @@
                 border-top: 1px solid var(--glass-border);
                 border-top-left-radius: 24px;
                 border-top-right-radius: 24px;
-                transform: translateY(100%);
             }
             
             .drawer-handle {
