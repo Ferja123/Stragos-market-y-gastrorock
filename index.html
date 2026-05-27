@@ -610,7 +610,8 @@
             backdrop-filter: blur(25px);
             z-index: 310;
             transform: translateX(100%);
-            /* quitado transition para que lo maneje GSAP al 100% */
+            display: none; /* Inicialmente oculto */
+            flex-direction: column;
         }
 
         .drawer-header {
@@ -1551,6 +1552,10 @@
             const drawer = document.getElementById('cart-drawer');
             const isMobile = window.innerWidth <= 768;
             
+            // Escudo protector contra llamadas duplicadas o animaciones simultáneas
+            const isOpen = drawer.style.display === "flex";
+            if (open === isOpen) return;
+            
             if (open) {
                 overlay.classList.add('active');
                 drawer.style.display = "flex";
@@ -1566,12 +1571,17 @@
                 const tl = gsap.timeline();
 
                 if (isMobile) {
-                    tl.fromTo(drawer, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: "power3.out" });
+                    tl.fromTo(drawer, { yPercent: 100, xPercent: 0 }, { yPercent: 0, xPercent: 0, duration: 0.5, ease: "power3.out" });
                 } else {
-                    tl.fromTo(drawer, { xPercent: 100 }, { xPercent: 0, duration: 0.5, ease: "power3.out" });
+                    tl.fromTo(drawer, { xPercent: 100, yPercent: 0 }, { xPercent: 0, yPercent: 0, duration: 0.5, ease: "power3.out" });
                 }
 
-                tl.from(".cart-item-row", { x: 30, opacity: 0, stagger: 0.08, duration: 0.4, ease: "power2.out" }, "-=0.25");
+                // Solo animar stagger de productos si existen en el carrito
+                const activeIds = Object.keys(cart);
+                if (activeIds.length > 0) {
+                    tl.from(".cart-item-row", { x: 30, opacity: 0, stagger: 0.08, duration: 0.4, ease: "power2.out" }, "-=0.25");
+                }
+                
                 tl.from(".delivery-section", { y: 20, opacity: 0, duration: 0.4, ease: "power2.out" }, "-=0.15");
             } else {
                 gsap.to(drawer, {
