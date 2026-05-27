@@ -675,6 +675,50 @@
             min-height: 70px;
         }
 
+        /* Botón de Geolocalización GPS Premium */
+        .btn-gps-location {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--secondary);
+            color: var(--text-main);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: var(--transition-smooth);
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .btn-gps-location:hover {
+            background: var(--secondary);
+            color: #0c0f17;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .gps-status {
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-top: 0.4rem;
+            display: none;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .gps-status.success {
+            color: #10b981; /* Verde éxito */
+            display: inline-flex;
+        }
+
+        .gps-status.error {
+            color: var(--primary); /* Rojo error */
+            display: inline-flex;
+        }
+
         /* Botón de Envío Final en Drawer */
         .drawer-footer {
             padding: 1.2rem;
@@ -963,6 +1007,16 @@
                         <label class="form-label" for="client-address">Dirección de Envío *</label>
                         <input class="form-input" type="text" id="client-address" required placeholder="Ej: Jr. San Martín 456, Moyobamba">
                     </div>
+
+                    <!-- GEOLOCALIZACIÓN GPS INTEGRADA -->
+                    <div class="form-group">
+                        <label class="form-label">Ubicación GPS (Opcional)</label>
+                        <button type="button" class="btn-gps-location" onclick="captureGPSLocation()">
+                            <i data-lucide="navigation" style="width: 16px; height: 16px;"></i>
+                            Compartir mi Ubicación 📍
+                        </button>
+                        <div id="gps-status-indicator" class="gps-status"></div>
+                    </div>
                     
                     <div class="form-group">
                         <label class="form-label" for="client-notes">Notas / Indicaciones del Delivery</label>
@@ -1109,8 +1163,9 @@
             }
         ];
 
-        // ESTADO DEL CARRITO
+        // ESTADO DEL CARRITO Y GPS
         let cart = {};
+        let capturedGpsLink = "";
 
         // RENDERIZAR PRODUCTOS EN EL DOM
         function renderProducts() {
@@ -1312,7 +1367,54 @@
             event.currentTarget.classList.add('active');
         };
 
-        // CONFIRMAR PEDIDO Y REDIRIGIR A WHATSAPP CON MENSAJE PREMIUM ESTRUCTURADO
+        // GEOLOCALIZACIÓN: Obtener coordenadas GPS en vivo y generar enlace a Google Maps
+        window.captureGPSLocation = function() {
+            const indicator = document.getElementById('gps-status-indicator');
+            indicator.className = "gps-status";
+            indicator.innerHTML = '<i data-lucide="loader" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"></i> Obteniendo señal GPS...';
+            indicator.style.display = "inline-flex";
+            lucide.createIcons();
+
+            if (!navigator.geolocation) {
+                indicator.className = "gps-status error";
+                indicator.innerHTML = '❌ Tu navegador no soporta geolocalización.';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    capturedGpsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                    
+                    indicator.className = "gps-status success";
+                    indicator.innerHTML = '✅ ¡Ubicación capturada con éxito! 📍';
+                    lucide.createIcons();
+                },
+                (error) => {
+                    console.error("Error capturando ubicación GPS:", error);
+                    indicator.className = "gps-status error";
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            indicator.innerHTML = '❌ Permiso denegado. Activa el GPS de tu celular.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            indicator.innerHTML = '❌ Señal GPS no disponible temporalmente.';
+                            break;
+                        case error.TIMEOUT:
+                            indicator.innerHTML = '❌ Tiempo de espera agotado. Intenta de nuevo.';
+                            break;
+                        default:
+                            indicator.innerHTML = '❌ Error al capturar tu ubicación.';
+                    }
+                    lucide.createIcons();
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        };
+
+        // CONFIRMAR PEDIDO Y REDIRIGIR A WHATSAPP CON MENSAJE PREMIUM ESTRUCTURADO Y GOOGLE MAPS
         window.submitOrder = function() {
             // Validar si el carrito está vacío
             const activeIds = Object.keys(cart);
@@ -1351,6 +1453,9 @@
             waMessage += `%0A👤 *Cliente:* ${clientName}`;
             waMessage += `%0A📞 *Teléfono:* ${clientPhone}`;
             waMessage += `%0A🚚 *Dirección:* ${clientAddress}`;
+            if (capturedGpsLink) {
+                waMessage += `%0A📍 *Ubicación GPS:* ${capturedGpsLink}`;
+            }
             if (clientNotes) {
                 waMessage += `%0A💬 *Notas:* ${clientNotes}`;
             }
@@ -1370,5 +1475,12 @@
             renderProducts();
         });
     </script>
+    <style>
+        /* Animación rotatoria para el indicador de carga GPS */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </body>
 </html>
