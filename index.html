@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stragos Market | Gastro Rock - Pedidos Express</title>
+    <link rel="icon" type="image/jpeg" href="images/logo.jpeg">
     
     <!-- Google Fonts para una tipografía ultra moderna y con actitud rockera -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +13,10 @@
     
     <!-- Iconos Lucide para una interfaz limpia -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Librerías de GSAP & ScrollTrigger para animaciones premium e interacciones cinemáticas -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
     <style>
         /* --- SISTEMA DE DISEÑO & TOKENS --- */
@@ -28,6 +33,23 @@
             --glass-border: rgba(255, 255, 255, 0.08);
             --shadow-neon: 0 0 20px var(--primary-glow);
             --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Ambient Glow Cursor Follower */
+        .cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, hsla(355, 85%, 55%, 0.12) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+            transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
+            display: none; /* Activo por JS en computadoras */
         }
 
         * {
@@ -71,6 +93,7 @@
             position: relative;
             z-index: 110;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+            opacity: 0; /* Controlado inicialmente por GSAP */
         }
 
         /* --- HEADER & HERO --- */
@@ -101,6 +124,15 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            opacity: 0; /* Controlado por GSAP */
+        }
+
+        .logo img {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .logo:hover img {
+            transform: rotate(15deg) scale(1.1);
         }
 
         .logo span {
@@ -116,6 +148,7 @@
             align-items: center;
             justify-content: center;
             padding: 0.4rem; /* Área táctil ampliada */
+            opacity: 0; /* Controlado por GSAP */
         }
 
         .social-icons a:hover {
@@ -137,6 +170,7 @@
             line-height: 1.1;
             margin-bottom: 0.8rem;
             text-transform: uppercase;
+            opacity: 0; /* Controlado por GSAP */
         }
 
         .hero h1 span {
@@ -151,6 +185,7 @@
             margin-bottom: 1rem;
             font-weight: 300;
             line-height: 1.4;
+            opacity: 0; /* Controlado por GSAP */
         }
 
         /* --- CATEGORY SELECTOR (OPTIMIZADO PARA MOVIMIENTO TÁCTIL) --- */
@@ -189,6 +224,7 @@
             align-items: center;
             gap: 0.4rem;
             min-height: 38px; /* Altura óptima móvil */
+            opacity: 0; /* Controlado por GSAP */
         }
 
         .category-btn:hover, .category-btn.active {
@@ -214,6 +250,18 @@
             gap: 0.6rem;
             border-left: 4px solid var(--primary);
             padding-left: 0.6rem;
+            position: relative;
+            padding-bottom: 0.6rem;
+        }
+
+        .section-title-line {
+            position: absolute;
+            bottom: 0;
+            left: 0.6rem;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), transparent);
+            will-change: width;
         }
 
         .products-grid {
@@ -233,13 +281,16 @@
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            transition: var(--transition-smooth);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
             backdrop-filter: blur(5px);
+            opacity: 0; /* Animado en Scroll por GSAP */
+            transform-style: preserve-3d;
+            perspective: 1000px;
         }
 
         .product-card:hover {
             border-color: var(--primary);
-            box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.15);
+            box-shadow: 0 15px 30px rgba(239, 68, 68, 0.2), var(--shadow-neon);
         }
 
         /* Imagen del Producto */
@@ -249,6 +300,7 @@
             overflow: hidden;
             position: relative;
             background: #0f121d;
+            transform: translateZ(20px); /* Profundidad 3D */
         }
 
         .product-image {
@@ -282,6 +334,7 @@
             display: flex;
             flex-direction: column;
             flex-grow: 1;
+            transform: translateZ(10px); /* Profundidad 3D */
         }
 
         .product-info {
@@ -467,13 +520,7 @@
             backdrop-filter: blur(25px);
             z-index: 310;
             transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cart-drawer.active {
-            transform: translateX(0);
+            /* quitado transition para que lo maneje GSAP al 100% */
         }
 
         .drawer-header {
@@ -846,10 +893,6 @@
                 transform: translateY(100%);
             }
             
-            .cart-drawer.active {
-                transform: translateY(0);
-            }
-            
             .drawer-handle {
                 display: block; /* Muestra el tirador táctil */
             }
@@ -876,8 +919,11 @@
 </head>
 <body>
 
+    <!-- Ambient Glow Cursor Follower (Solo Desktop) -->
+    <div class="cursor-glow" id="cursor-glow"></div>
+
     <!-- BANNER DE PROMOCIÓN -->
-    <div class="promo-banner">
+    <div class="promo-banner" id="promo-banner">
         <i data-lucide="truck" style="width: 16px; height: 16px;"></i>
         ¡Delivery Gratis en toda Moyobamba! 🚚🎉
     </div>
@@ -885,11 +931,11 @@
     <!-- CABECERA -->
     <header>
         <div class="header-container">
-            <div class="logo">
-                <i data-lucide="flame" style="color: var(--primary); fill: var(--primary);"></i>
+            <div class="logo" id="logo">
+                <img src="images/logo.jpeg" alt="Stragos Logo" style="height: 42px; width: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); box-shadow: var(--shadow-neon);">
                 STRAGOS<span>MARKET</span>
             </div>
-            <div class="social-icons">
+            <div class="social-icons" id="social-icons">
                 <a href="https://www.instagram.com/stragos_gastrorock/" target="_blank" aria-label="Instagram">
                     <i data-lucide="instagram"></i>
                 </a>
@@ -902,12 +948,12 @@
 
     <!-- HÉROE PRESENTACIÓN -->
     <section class="hero">
-        <h1>Minimarket & <span>Gastro Rock</span></h1>
-        <p>Licores helados, bebidas, snacks y cortes premium directo a tu puerta con ritmo de Rock & Roll.</p>
+        <h1 id="hero-title">Minimarket & <span>Gastro Rock</span></h1>
+        <p id="hero-desc">Licores helados, bebidas, snacks y cortes premium directo a tu puerta con ritmo de Rock & Roll.</p>
     </section>
 
     <!-- SELECTOR DE CATEGORÍAS RÁPIDO -->
-    <nav class="categories-nav">
+    <nav class="categories-nav" id="categories-nav">
         <button class="category-btn active" onclick="scrollToCategory('licores')">
             <i data-lucide="beer"></i> Licores
         </button>
@@ -927,25 +973,37 @@
 
         <!-- CATEGORÍA: LICORES -->
         <section id="licores">
-            <h2 class="section-title"><i data-lucide="beer" style="color: var(--primary);"></i> Licores Helados</h2>
+            <h2 class="section-title">
+                <i data-lucide="beer" style="color: var(--primary);"></i> Licores Helados
+                <div class="section-title-line"></div>
+            </h2>
             <div class="products-grid" id="grid-licores"></div>
         </section>
 
         <!-- CATEGORÍA: BEBIDAS -->
         <section id="bebidas">
-            <h2 class="section-title"><i data-lucide="cup-soda" style="color: var(--primary);"></i> Bebidas & Refrescos</h2>
+            <h2 class="section-title">
+                <i data-lucide="cup-soda" style="color: var(--primary);"></i> Bebidas & Refrescos
+                <div class="section-title-line"></div>
+            </h2>
             <div class="products-grid" id="grid-bebidas"></div>
         </section>
 
         <!-- CATEGORÍA: SNACKS -->
         <section id="snacks">
-            <h2 class="section-title"><i data-lucide="cookie" style="color: var(--primary);"></i> Snacks & Complementos</h2>
+            <h2 class="section-title">
+                <i data-lucide="cookie" style="color: var(--primary);"></i> Snacks & Complementos
+                <div class="section-title-line"></div>
+            </h2>
             <div class="products-grid" id="grid-snacks"></div>
         </section>
 
         <!-- CATEGORÍA: CARNES -->
         <section id="carnes">
-            <h2 class="section-title"><i data-lucide="beef" style="color: var(--primary);"></i> Carnes & Gastro Rock Specials</h2>
+            <h2 class="section-title">
+                <i data-lucide="beef" style="color: var(--primary);"></i> Carnes & Gastro Rock Specials
+                <div class="section-title-line"></div>
+            </h2>
             <div class="products-grid" id="grid-carnes"></div>
         </section>
 
@@ -1163,6 +1221,9 @@
             }
         ];
 
+        // REGISTRAR PLUGIN SCROLLTRIGGER DE GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
         // ESTADO DEL CARRITO Y GPS
         let cart = {};
         let capturedGpsLink = "";
@@ -1203,22 +1264,196 @@
                 grid.innerHTML += cardHtml;
             });
             lucide.createIcons();
+
+            // EJECUTAR REVEAL DE TARJETAS AL HACER SCROLL CON GSAP
+            setTimeout(() => {
+                // Animación de cards
+                gsap.utils.toArray('.product-card').forEach(card => {
+                    gsap.fromTo(card, 
+                        { y: 50, opacity: 0 },
+                        {
+                            y: 0,
+                            opacity: 1,
+                            duration: 0.8,
+                            ease: "power2.out",
+                            scrollTrigger: {
+                                trigger: card,
+                                start: "top 92%",
+                                toggleActions: "play none none none"
+                            }
+                        }
+                    );
+                });
+
+                // Dibujar la línea neón de las secciones al hacer scroll y animar iconos
+                gsap.utils.toArray('.section-title').forEach(title => {
+                    const line = title.querySelector('.section-title-line');
+                    const icon = title.querySelector('i');
+                    
+                    gsap.timeline({
+                        scrollTrigger: {
+                            trigger: title,
+                            start: "top 90%",
+                            toggleActions: "play none none none"
+                        }
+                    })
+                    .fromTo(line, { width: "0%" }, { width: "80%", duration: 1.2, ease: "power3.out" })
+                    .fromTo(icon, { rotation: -30, scale: 0.7 }, { rotation: 0, scale: 1, duration: 0.6, ease: "back.out(2)" }, "-=0.8");
+                });
+
+                // Registrar efectos de Hover 3D en las tarjetas (Desktop only)
+                const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                if (!isTouchDevice && window.innerWidth > 768) {
+                    document.querySelectorAll('.product-card').forEach(card => {
+                        card.addEventListener('mousemove', (e) => {
+                            const rect = card.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            const rotateX = -((y / rect.height) - 0.5) * 16;
+                            const rotateY = ((x / rect.width) - 0.5) * 16;
+                            
+                            gsap.to(card, {
+                                rotationX: rotateX,
+                                rotationY: rotateY,
+                                transformPerspective: 1000,
+                                ease: "power2.out",
+                                duration: 0.3,
+                                boxShadow: "0 15px 30px rgba(239, 68, 68, 0.2), var(--shadow-neon)",
+                                borderColor: "var(--primary)"
+                            });
+                        });
+                        
+                        card.addEventListener('mouseleave', () => {
+                            gsap.to(card, {
+                                rotationX: 0,
+                                rotationY: 0,
+                                ease: "power3.out",
+                                duration: 0.6,
+                                boxShadow: "none",
+                                borderColor: "var(--glass-border)"
+                            });
+                        });
+                    });
+                }
+            }, 100);
         }
 
-        // ABRIR O CERRAR EL DRAWER DEL CARRITO (CON BLOQUEO DE SCROLL EN CELULAR)
+        // ANIMACIÓN DE ENTRADA INICIAL CON GSAP (ABOVE THE FOLD REVEAL)
+        function playInitialGSAPAnimations() {
+            const tl = gsap.timeline();
+            tl.to("#promo-banner", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" });
+            tl.to("#logo", { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, "-=0.2");
+            tl.to("#social-icons a", { opacity: 1, scale: 1, stagger: 0.08, duration: 0.5, ease: "back.out(1.7)" }, "-=0.3");
+            tl.to("#hero-title", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.3");
+            tl.to("#hero-desc", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.5");
+            tl.to(".category-btn", { opacity: 1, scale: 1, stagger: 0.06, duration: 0.5, ease: "back.out(1.2)" }, "-=0.5");
+        }
+
+        // CABECERA INTELIGENTE Y SEGUIDOR DE CURSOR GLOW
+        function initGlobalInteractions() {
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            // 1. Cabecera Inteligente (Smart Sticky Header)
+            let lastScrollY = window.scrollY;
+            const header = document.querySelector('header');
+            
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > 100) {
+                    header.style.padding = "0.6rem 1rem";
+                    header.style.backgroundColor = "rgba(12, 15, 23, 0.98)";
+                    if (currentScrollY > lastScrollY && currentScrollY > 200) {
+                        // Scrolling down - hide header smoothly
+                        gsap.to(header, { yPercent: -120, duration: 0.3, ease: "power2.out" });
+                    } else {
+                        // Scrolling up - show header smoothly
+                        gsap.to(header, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+                    }
+                } else {
+                    header.style.padding = "1rem 1rem";
+                    header.style.backgroundColor = "rgba(12, 15, 23, 0.85)";
+                    gsap.to(header, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+                }
+                lastScrollY = currentScrollY;
+            }, { passive: true });
+
+            // 2. Cursor Follower (Desktop only)
+            const glow = document.getElementById('cursor-glow');
+            if (!isTouchDevice && window.innerWidth > 768) {
+                glow.style.display = 'block';
+                
+                const setGlowX = gsap.quickSetter(glow, "x", "px");
+                const setGlowY = gsap.quickSetter(glow, "y", "px");
+                
+                window.addEventListener('mousemove', (e) => {
+                    setGlowX(e.clientX);
+                    setGlowY(e.clientY);
+                });
+                
+                // Hover intensificar sobre elementos interactivos
+                const registerGlowHovers = () => {
+                    const interactiveElements = document.querySelectorAll('a, button, .product-card, .category-btn, .qty-btn');
+                    interactiveElements.forEach(el => {
+                        el.addEventListener('mouseenter', () => {
+                            gsap.to(glow, {
+                                width: '450px',
+                                height: '450px',
+                                background: 'radial-gradient(circle, hsla(355, 85%, 55%, 0.22) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 70%)',
+                                duration: 0.3
+                            });
+                        });
+                        el.addEventListener('mouseleave', () => {
+                            gsap.to(glow, {
+                                width: '350px',
+                                height: '350px',
+                                background: 'radial-gradient(circle, hsla(355, 85%, 55%, 0.12) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 70%)',
+                                duration: 0.3
+                            });
+                        });
+                    });
+                };
+
+                // Ejecutar después de renderizar productos
+                setTimeout(registerGlowHovers, 500);
+            }
+        }
+
+        // ABRIR O CERRAR EL DRAWER DEL CARRITO (CON TIMELINE EN CASCADA DE GSAP)
         window.toggleCartDrawer = function(open) {
             const overlay = document.getElementById('cart-overlay');
             const drawer = document.getElementById('cart-drawer');
             
             if (open) {
                 overlay.classList.add('active');
-                drawer.classList.add('active');
+                drawer.style.display = "flex";
                 document.body.classList.add('lock-scroll'); // Scroll locking
                 renderCartDrawerItems();
+
+                // Timeline de apertura GSAP
+                const tl = gsap.timeline();
+                const isMobile = window.innerWidth <= 768;
+
+                if (isMobile) {
+                    tl.fromTo(drawer, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: "power3.out" });
+                } else {
+                    tl.fromTo(drawer, { xPercent: 100 }, { xPercent: 0, duration: 0.5, ease: "power3.out" });
+                }
+
+                tl.from(".cart-item-row", { x: 30, opacity: 0, stagger: 0.08, duration: 0.4, ease: "power2.out" }, "-=0.25");
+                tl.from(".delivery-section", { y: 20, opacity: 0, duration: 0.4, ease: "power2.out" }, "-=0.15");
             } else {
-                overlay.classList.remove('active');
-                drawer.classList.remove('active');
-                document.body.classList.remove('lock-scroll');
+                const isMobile = window.innerWidth <= 768;
+                gsap.to(drawer, {
+                    xPercent: isMobile ? 0 : 100,
+                    yPercent: isMobile ? 100 : 0,
+                    duration: 0.4,
+                    ease: "power3.in",
+                    onComplete: () => {
+                        overlay.classList.remove('active');
+                        document.body.classList.remove('lock-scroll');
+                        drawer.style.display = "none";
+                    }
+                });
             }
         };
 
@@ -1278,7 +1513,7 @@
             lucide.createIcons();
         }
 
-        // ACTUALIZAR CANTIDAD EN EL CARRITO
+        // ACTUALIZAR CANTIDAD EN EL CARRITO (CON REBOTE ELÁSTICO GSAP)
         window.updateQty = function(productId, delta) {
             const currentQty = cart[productId] || 0;
             const newQty = Math.max(0, currentQty + delta);
@@ -1291,13 +1526,17 @@
             
             // Actualizar visualmente en las tarjetas de la grilla
             const qtyElement = document.getElementById(`qty-${productId}`);
-            if (qtyElement) qtyElement.innerText = newQty;
+            if (qtyElement) {
+                qtyElement.innerText = newQty;
+                // Pequeño rebote elástico neón
+                gsap.fromTo(qtyElement, { scale: 1.4 }, { scale: 1, duration: 0.4, ease: "back.out(2)" });
+            }
             
             updateCartSummary();
             
             // Si el drawer está abierto, refrescar su contenido
             const drawer = document.getElementById('cart-drawer');
-            if (drawer.classList.contains('active')) {
+            if (drawer.style.display === 'flex') {
                 renderCartDrawerItems();
             }
         };
@@ -1337,7 +1576,14 @@
             drawerTotalElement.innerText = total.toFixed(2);
             
             if (itemsCount > 0) {
-                cartBar.classList.add('active');
+                if (!cartBar.classList.contains('active')) {
+                    // Animación de aparición flotante con GSAP
+                    cartBar.classList.add('active');
+                    gsap.fromTo(cartBar, { y: 100, scale: 0.9 }, { y: 0, scale: 1, duration: 0.5, ease: "back.out(1.2)" });
+                } else {
+                    // Si ya está activo, rebote elástico rápido de pulso para indicar actualización
+                    gsap.fromTo(cartBar, { scale: 1.04 }, { scale: 1, duration: 0.4, ease: "back.out(2.5)" });
+                }
             } else {
                 cartBar.classList.remove('active');
                 toggleCartDrawer(false); // Cerrar panel si el carrito se vacía
@@ -1473,6 +1719,8 @@
         // RENDERIZAR EN EL LOGIN DE LA PÁGINA
         document.addEventListener('DOMContentLoaded', () => {
             renderProducts();
+            playInitialGSAPAnimations();
+            initGlobalInteractions();
         });
     </script>
     <style>
