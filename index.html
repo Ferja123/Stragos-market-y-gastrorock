@@ -48,8 +48,15 @@
             z-index: -1;
             transform: translate(-50%, -50%);
             will-change: transform;
-            transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
+            transition: width 0.4s ease, height 0.4s ease, background 0.4s ease;
             display: none; /* Activo por JS en computadoras */
+        }
+
+        /* Ampliación de brillo con CSS :has() nativo de alto rendimiento */
+        body:has(a:hover, button:hover, .product-card:hover, .category-btn:hover, .qty-btn:hover, .hero-3d-badge:hover) .cursor-glow {
+            width: 460px;
+            height: 460px;
+            background: radial-gradient(circle, hsla(355, 85%, 55%, 0.22) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 70%);
         }
 
         * {
@@ -157,18 +164,27 @@
         }
 
         .hero {
-            text-align: center;
-            padding: 2.5rem 1rem 1.5rem;
-            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            padding: 3rem 1rem 2rem;
+            max-width: 1200px;
             margin: 0 auto;
+            text-align: left;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 650px;
         }
 
         .hero h1 {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 0.8rem;
+            line-height: 1.15;
+            margin-bottom: 1rem;
             text-transform: uppercase;
             opacity: 0; /* Controlado por GSAP */
         }
@@ -181,11 +197,85 @@
 
         .hero p {
             color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 1rem;
             margin-bottom: 1rem;
             font-weight: 300;
-            line-height: 1.4;
+            line-height: 1.5;
             opacity: 0; /* Controlado por GSAP */
+        }
+
+        /* Contenedor 3D del Vinilo */
+        .hero-3d-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            width: 280px;
+            height: 280px;
+            position: relative;
+            flex-shrink: 0;
+            opacity: 0; /* Controlado por GSAP */
+        }
+
+        .hero-3d-badge {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1c2130 20%, #0a0d14 70%);
+            border: 5px solid #000;
+            box-shadow: 0 15px 35px rgba(239, 68, 68, 0.25), var(--shadow-neon);
+            position: relative;
+            transform-style: preserve-3d;
+            will-change: transform;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .hero-3d-badge:hover {
+            box-shadow: 0 20px 45px rgba(245, 158, 11, 0.35), 0 0 25px rgba(245, 158, 11, 0.5);
+        }
+
+        .hero-3d-badge::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px dashed var(--secondary);
+            opacity: 0.4;
+            animation: spin 30s linear infinite;
+        }
+
+        .hero-3d-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--secondary);
+            transform: translateZ(30px); /* Efecto popout */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            z-index: 5;
+        }
+
+        .hero-3d-groove {
+            position: absolute;
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transform: translateZ(10px);
+        }
+
+        .hero-3d-groove-2 {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.04);
+            transform: translateZ(18px);
         }
 
         /* --- CATEGORY SELECTOR (OPTIMIZADO PARA MOVIMIENTO TÁCTIL) --- */
@@ -697,7 +787,6 @@
             color: var(--text-muted);
         }
 
-        /* Inputs a 16px para evitar el Auto-Zoom en iPhones */
         .form-input {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
@@ -706,14 +795,14 @@
             color: var(--text-main);
             font-family: inherit;
             font-size: 16px; /* Evita zoom iOS */
-            transition: var(--transition-smooth);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             width: 100%;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+            border-color: var(--secondary);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.25), var(--shadow-neon);
             background: rgba(255, 255, 255, 0.06);
         }
 
@@ -862,13 +951,32 @@
         /* --- AUTOMATIZACIÓN ADAPTATIVA PARA MÓVILES (BOTTOM SHEET UX) --- */
         @media (max-width: 768px) {
             .hero {
-                padding: 2rem 0.5rem 1rem;
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem 1rem 1rem;
+                gap: 1.5rem;
+            }
+            .hero-text {
+                max-width: 100%;
             }
             .hero h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
             .hero p {
-                font-size: 0.88rem;
+                font-size: 0.92rem;
+            }
+            .hero-3d-container {
+                width: 200px;
+                height: 200px;
+                margin: 0.5rem auto;
+            }
+            .hero-3d-badge {
+                width: 170px;
+                height: 170px;
+            }
+            .hero-3d-logo {
+                width: 75px;
+                height: 75px;
             }
             .section-title {
                 font-size: 1.35rem;
@@ -946,10 +1054,19 @@
         </div>
     </header>
 
-    <!-- HÉROE PRESENTACIÓN -->
+    <!-- HÉROE PRESENTACIÓN (DISEÑO 3D EN DOS COLUMNAS) -->
     <section class="hero">
-        <h1 id="hero-title">Minimarket & <span>Gastro Rock</span></h1>
-        <p id="hero-desc">Licores helados, bebidas, snacks y cortes premium directo a tu puerta con ritmo de Rock & Roll.</p>
+        <div class="hero-text">
+            <h1 id="hero-title">Minimarket & <span>Gastro Rock</span></h1>
+            <p id="hero-desc">Licores helados, bebidas, snacks y cortes premium directo a tu puerta con ritmo de Rock & Roll.</p>
+        </div>
+        <div class="hero-3d-container" id="hero-3d-container">
+            <div class="hero-3d-badge">
+                <div class="hero-3d-groove"></div>
+                <div class="hero-3d-groove-2"></div>
+                <img src="images/logo.jpeg" alt="Stragos Rock Logo" class="hero-3d-logo">
+            </div>
+        </div>
     </section>
 
     <!-- SELECTOR DE CATEGORÍAS RÁPIDO -->
@@ -1346,10 +1463,11 @@
             tl.to("#social-icons a", { opacity: 1, scale: 1, stagger: 0.08, duration: 0.5, ease: "back.out(1.7)" }, "-=0.3");
             tl.to("#hero-title", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.3");
             tl.to("#hero-desc", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.5");
+            tl.to("#hero-3d-container", { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "-=0.5");
             tl.to(".category-btn", { opacity: 1, scale: 1, stagger: 0.06, duration: 0.5, ease: "back.out(1.2)" }, "-=0.5");
         }
 
-        // CABECERA INTELIGENTE Y SEGUIDOR DE CURSOR GLOW
+        // CABECERA INTELIGENTE, SEGUIDOR DE CURSOR GLOW Y EMBLEMA 3D DEL HÉROE
         function initGlobalInteractions() {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
@@ -1377,7 +1495,7 @@
                 lastScrollY = currentScrollY;
             }, { passive: true });
 
-            // 2. Cursor Follower (Desktop only)
+            // 2. Cursor Follower (Desktop only) - Ultra Optimizado a 60/120 FPS sin JS listeners de Hover
             const glow = document.getElementById('cursor-glow');
             if (!isTouchDevice && window.innerWidth > 768) {
                 glow.style.display = 'block';
@@ -1389,32 +1507,41 @@
                     setGlowX(e.clientX);
                     setGlowY(e.clientY);
                 });
-                
-                // Hover intensificar sobre elementos interactivos
-                const registerGlowHovers = () => {
-                    const interactiveElements = document.querySelectorAll('a, button, .product-card, .category-btn, .qty-btn');
-                    interactiveElements.forEach(el => {
-                        el.addEventListener('mouseenter', () => {
-                            gsap.to(glow, {
-                                width: '450px',
-                                height: '450px',
-                                background: 'radial-gradient(circle, hsla(355, 85%, 55%, 0.22) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 70%)',
-                                duration: 0.3
-                            });
-                        });
-                        el.addEventListener('mouseleave', () => {
-                            gsap.to(glow, {
-                                width: '350px',
-                                height: '350px',
-                                background: 'radial-gradient(circle, hsla(355, 85%, 55%, 0.12) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 70%)',
-                                duration: 0.3
-                            });
-                        });
-                    });
-                };
+            }
 
-                // Ejecutar después de renderizar productos
-                setTimeout(registerGlowHovers, 500);
+            // 3. Inclinación Interactiva 3D (3D Mouse Tilt) del Vinilo del Héroe (Desktop only)
+            const heroBadge = document.querySelector('.hero-3d-badge');
+            if (heroBadge && !isTouchDevice && window.innerWidth > 768) {
+                window.addEventListener('mousemove', (e) => {
+                    const rect = heroBadge.getBoundingClientRect();
+                    const badgeCenterX = rect.left + rect.width / 2;
+                    const badgeCenterY = rect.top + rect.height / 2;
+                    
+                    const deltaX = e.clientX - badgeCenterX;
+                    const deltaY = e.clientY - badgeCenterY;
+                    
+                    // Rotación en perspectiva basada en el mouse
+                    const rotateX = -(deltaY / window.innerHeight) * 35;
+                    const rotateY = (deltaX / window.innerWidth) * 35;
+                    
+                    gsap.to(heroBadge, {
+                        rotationX: rotateX,
+                        rotationY: rotateY,
+                        transformPerspective: 800,
+                        ease: "power2.out",
+                        duration: 0.5
+                    });
+                });
+
+                // Retorno elástico al sacar el cursor
+                document.querySelector('.hero-3d-container').addEventListener('mouseleave', () => {
+                    gsap.to(heroBadge, {
+                        rotationX: 0,
+                        rotationY: 0,
+                        ease: "power3.out",
+                        duration: 0.8
+                    });
+                });
             }
         }
 
@@ -1422,16 +1549,21 @@
         window.toggleCartDrawer = function(open) {
             const overlay = document.getElementById('cart-overlay');
             const drawer = document.getElementById('cart-drawer');
+            const isMobile = window.innerWidth <= 768;
             
             if (open) {
                 overlay.classList.add('active');
                 drawer.style.display = "flex";
-                document.body.classList.add('lock-scroll'); // Scroll locking
+                
+                // Evitar lock-scroll en celular para prevenir congelamiento con el teclado virtual
+                if (!isMobile) {
+                    document.body.classList.add('lock-scroll');
+                }
+                
                 renderCartDrawerItems();
 
                 // Timeline de apertura GSAP
                 const tl = gsap.timeline();
-                const isMobile = window.innerWidth <= 768;
 
                 if (isMobile) {
                     tl.fromTo(drawer, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: "power3.out" });
@@ -1442,7 +1574,6 @@
                 tl.from(".cart-item-row", { x: 30, opacity: 0, stagger: 0.08, duration: 0.4, ease: "power2.out" }, "-=0.25");
                 tl.from(".delivery-section", { y: 20, opacity: 0, duration: 0.4, ease: "power2.out" }, "-=0.15");
             } else {
-                const isMobile = window.innerWidth <= 768;
                 gsap.to(drawer, {
                     xPercent: isMobile ? 0 : 100,
                     yPercent: isMobile ? 100 : 0,
