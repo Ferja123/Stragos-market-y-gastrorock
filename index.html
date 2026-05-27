@@ -54,6 +54,25 @@
             overflow: hidden;
         }
 
+        /* Banner de Delivery Gratis */
+        .promo-banner {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: var(--text-main);
+            text-align: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 110;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
         /* --- HEADER & HERO --- */
         header {
             background: linear-gradient(180deg, rgba(12, 15, 23, 0.95) 0%, rgba(12, 15, 23, 0) 100%);
@@ -813,6 +832,12 @@
 </head>
 <body>
 
+    <!-- BANNER DE PROMOCIÓN -->
+    <div class="promo-banner">
+        <i data-lucide="truck" style="width: 16px; height: 16px;"></i>
+        ¡Delivery Gratis en toda Moyobamba! 🚚🎉
+    </div>
+
     <!-- CABECERA -->
     <header>
         <div class="header-container">
@@ -948,12 +973,18 @@
         </div>
 
         <div class="drawer-footer">
+            <div class="drawer-summary-row" style="margin-bottom: 0.4rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 0.4rem;">
+                <span class="drawer-summary-label" style="font-size: 0.85rem;">Envío:</span>
+                <span style="font-size: 0.9rem; font-weight: 700; color: var(--secondary); display: flex; align-items: center; gap: 0.2rem;">
+                    Gratis <i data-lucide="gift" style="width:14px; height:14px;"></i>
+                </span>
+            </div>
             <div class="drawer-summary-row">
-                <span class="drawer-summary-label">Total acumulado:</span>
+                <span class="drawer-summary-label">Total a pagar:</span>
                 <span class="drawer-summary-total" id="drawer-total">0.00</span>
             </div>
             <button class="btn-submit-order" onclick="submitOrder()">
-                Enviar Pedido a WhatsApp
+                Realizar Pedido
                 <i data-lucide="send"></i>
             </button>
         </div>
@@ -1326,7 +1357,9 @@
             waMessage += `%0A━━━━━━━━━━━━━━━━━━━━`;
             waMessage += `%0A📦 *Detalle del Pedido:*${itemsText}`;
             waMessage += `%0A━━━━━━━━━━━━━━━━━━━━`;
-            waMessage += `%0A💰 *TOTAL A PAGAR: S/. ${total.toFixed(2)}*`;
+            waMessage += `%0A🚚 *Envío:* GRATIS 🎉`;
+            waMessage += `%0A━━━━━━━━━━━━━━━━━━━━`;
+            waMessage += `%0A💰 *TOTAL A PAGAR: S/. ${total.toFixed(2)} (Delivery Gratis)*`;
 
             const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${waMessage}`;
             window.open(waUrl, '_blank');
