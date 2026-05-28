@@ -6,10 +6,10 @@
     <title>Stragos Market | Gastro Rock - Pedidos Express</title>
     <link rel="icon" type="image/jpeg" href="images/logo.jpeg">
     
-    <!-- Google Fonts para una tipografía ultra moderna y con actitud rockera -->
+    <!-- Google Fonts para una tipografía ultra moderna y con actitud rockera (Bebas Neue y Syne) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@700;800&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Iconos Lucide para una interfaz limpia -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -92,6 +92,22 @@
             overflow-x: hidden;
             background-attachment: fixed;
             animation: auroraBreathe 20s ease-in-out infinite alternate;
+            position: relative;
+        }
+
+        /* Textura táctil de trama de puntos (Halftone Screenprint) estilo póster de rock */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 0);
+            background-size: 24px 24px;
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 1000;
         }
 
         /* Bloquear scroll de fondo */
@@ -139,10 +155,10 @@
         }
 
         .logo {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 1.35rem;
-            letter-spacing: -1px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
+            font-size: 2.1rem;
+            letter-spacing: 2px;
             color: var(--text-main);
             display: flex;
             align-items: center;
@@ -213,12 +229,13 @@
         }
 
         .hero h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.4rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 3.8rem;
             font-weight: 800;
-            line-height: 1.15;
-            margin-bottom: 1rem;
+            line-height: 0.92;
+            margin-bottom: 1.2rem;
             text-transform: uppercase;
+            letter-spacing: -2px;
             opacity: 0; /* Controlado por GSAP */
         }
 
@@ -372,8 +389,10 @@
         }
 
         .section-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.4rem;
+            letter-spacing: 2px;
+            font-weight: 400;
             margin: 2.5rem 0 1.2rem;
             display: flex;
             align-items: center;
@@ -1057,6 +1076,80 @@
             .btn-submit-order {
                 font-size: 0.9rem;
             }
+
+            /* --- PRODUCT CARDS ASYMMETRIC / FEATURED SYSTEM --- */
+            @media (min-width: 992px) {
+                .product-card.featured {
+                    grid-column: span 2;
+                    flex-direction: row;
+                    align-items: stretch;
+                }
+                .product-card.featured .product-image-container {
+                    width: 45%;
+                    height: 100%;
+                }
+                .product-card.featured .product-card-body {
+                    width: 55%;
+                    padding: 1.5rem;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                }
+            }
+
+            .product-desc {
+                font-size: 0.88rem;
+                color: var(--text-muted);
+                line-height: 1.5;
+                margin: 0.5rem 0 1rem;
+                font-weight: 300;
+            }
+
+            /* --- INTERACTIVE VINYL SPINNING & VISUALIZER --- */
+            .hero-3d-badge {
+                animation: spin 16s linear infinite;
+                animation-play-state: running; /* Spinning by default */
+            }
+            
+            .hero-3d-badge.paused {
+                animation-play-state: paused;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), var(--glass-border);
+            }
+
+            .vinyl-visualizer {
+                position: absolute;
+                bottom: 12px;
+                display: flex;
+                gap: 4px;
+                height: 20px;
+                z-index: 10;
+                pointer-events: none;
+                opacity: 0.85;
+                transition: opacity 0.3s ease;
+                transform: translateZ(32px); /* popout visualizer */
+            }
+            
+            .hero-3d-badge.paused .vinyl-visualizer {
+                opacity: 0;
+            }
+
+            .vis-bar {
+                width: 3px;
+                height: 100%;
+                background: var(--secondary);
+                border-radius: 2px;
+                animation: bounce 0.8s ease-in-out infinite alternate;
+                transform-origin: bottom;
+            }
+            
+            .vis-bar:nth-child(2) { animation-delay: 0.15s; background: var(--primary); }
+            .vis-bar:nth-child(3) { animation-delay: 0.3s; background: var(--secondary); }
+            .vis-bar:nth-child(4) { animation-delay: 0.45s; background: var(--primary); }
+
+            @keyframes bounce {
+                0% { transform: scaleY(0.2); }
+                100% { transform: scaleY(1); }
+            }
         }
     </style>
 </head>
@@ -1101,10 +1194,16 @@
             <p id="hero-desc">Licores helados, bebidas, snacks y cortes premium directo a tu puerta con ritmo de Rock & Roll.</p>
         </div>
         <div class="hero-3d-container" id="hero-3d-container">
-            <div class="hero-3d-badge">
+            <div class="hero-3d-badge" onclick="toggleVinylPlayback()">
                 <div class="hero-3d-groove"></div>
                 <div class="hero-3d-groove-2"></div>
                 <img src="images/logo.jpeg" alt="Stragos Rock Logo" class="hero-3d-logo">
+                <div class="vinyl-visualizer">
+                    <span class="vis-bar"></span>
+                    <span class="vis-bar"></span>
+                    <span class="vis-bar"></span>
+                    <span class="vis-bar"></span>
+                </div>
             </div>
         </div>
     </section>
@@ -1283,7 +1382,9 @@
                 price: 12.00, 
                 category: "licores", 
                 badge: "Artesanal",
-                image: "images/cerveza_artesanal.png" 
+                image: "images/cerveza_artesanal.png",
+                featured: true,
+                desc: "Nuestra cerveza negra insignia de cuerpo robusto y notas a cacao tostado. Una oda al rock pesado."
             },
             { 
                 id: "LIC-002", 
@@ -1308,7 +1409,9 @@
                 price: 3.50, 
                 category: "bebidas", 
                 badge: "Helada",
-                image: "images/coca_cola.png" 
+                image: "images/coca_cola.png",
+                featured: true,
+                desc: "La clásica compañera de tus noches de concierto en envase de vidrio helado tradicional."
             },
             { 
                 id: "BEB-002", 
@@ -1333,7 +1436,9 @@
                 price: 5.50, 
                 category: "snacks", 
                 badge: "Crujiente",
-                image: "images/papas_nativas.png" 
+                image: "images/papas_nativas.png",
+                featured: true,
+                desc: "Crocantes papas seleccionadas con piel, sazonadas a mano con cristales de sal marina."
             },
             { 
                 id: "SNA-002", 
@@ -1358,7 +1463,9 @@
                 price: 35.00, 
                 category: "carnes", 
                 badge: "Especialidad",
-                image: "images/costillas_bbq.png" 
+                image: "images/costillas_bbq.png",
+                featured: true,
+                desc: "Bañadas en salsa BBQ bourbon secreta, ahumadas lentamente por 8 horas hasta desprenderse del hueso."
             },
             { 
                 id: "CAR-002", 
@@ -1406,7 +1513,7 @@
                 if (!grid) return;
 
                 const cardHtml = `
-                    <div class="product-card">
+                    <div class="product-card ${product.featured ? 'featured' : ''}">
                         <div class="product-image-container">
                             ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
                             <img src="${product.image}" alt="${product.name}" class="product-image" loading="lazy">
@@ -1416,6 +1523,7 @@
                                 <div class="product-category">${product.category}</div>
                                 <div class="product-title">${product.name}</div>
                                 <div class="product-id">ID: ${product.id}</div>
+                                ${product.desc ? `<p class="product-desc">${product.desc}</p>` : ''}
                             </div>
                             <div class="product-footer">
                                 <div class="product-price">${product.price.toFixed(2)}</div>
@@ -2084,6 +2192,17 @@
             init();
             animate();
         }
+
+        // Interacción táctil/click en el vinilo para reproducir/pausar con rebote elástico
+        window.toggleVinylPlayback = function() {
+            const badge = document.querySelector('.hero-3d-badge');
+            if (badge) {
+                badge.classList.toggle('paused');
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(badge, { scale: 0.95 }, { scale: 1, duration: 0.4, ease: "back.out(2)" });
+                }
+            }
+        };
 
         // RENDERIZAR EN EL LOGIN DE LA PÁGINA
         document.addEventListener('DOMContentLoaded', () => {
