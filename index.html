@@ -134,12 +134,29 @@
             opacity: 0; /* Controlado por GSAP */
         }
 
-        .logo img {
+        .logo-circle-container {
+            height: 42px;
+            width: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow-neon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo-circle-container img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            transform: scale(1.25); /* Zoom para recortar bordes de la imagen WhatsApp */
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .logo:hover img {
-            transform: rotate(15deg) scale(1.1);
+        .logo:hover .logo-circle-container img {
+            transform: scale(1.45) rotate(15deg);
         }
 
         .logo span {
@@ -258,7 +275,7 @@
             top: 0;
             left: 0;
             border: 4px solid var(--secondary);
-            transform: translateZ(30px); /* Efecto popout */
+            transform: translateZ(30px) scale(1.25); /* Zoom para recortar bordes de la imagen WhatsApp y efecto popout */
             box-shadow: 0 8px 20px rgba(0,0,0,0.6);
             z-index: 5;
         }
@@ -1042,7 +1059,9 @@
     <header>
         <div class="header-container">
             <div class="logo" id="logo">
-                <img src="images/logo.jpeg" alt="Stragos Logo" style="height: 42px; width: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); box-shadow: var(--shadow-neon);">
+                <div class="logo-circle-container">
+                    <img src="images/logo.jpeg" alt="Stragos Logo">
+                </div>
                 STRAGOS<span>MARKET</span>
             </div>
             <div class="social-icons" id="social-icons">
@@ -1341,11 +1360,25 @@
         ];
 
         // REGISTRAR PLUGIN SCROLLTRIGGER DE GSAP
-        gsap.registerPlugin(ScrollTrigger);
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+        }
 
         // ESTADO DEL CARRITO Y GPS
         let cart = {};
         let capturedGpsLink = "";
+        window.isCartOpen = false;
+
+        // Función de renderizado seguro de iconos de Lucide
+        function safeCreateIcons() {
+            try {
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.warn("Lucide icons failed to render:", e);
+            }
+        }
 
         // RENDERIZAR PRODUCTOS EN EL DOM
         function renderProducts() {
@@ -1382,10 +1415,12 @@
                 `;
                 grid.innerHTML += cardHtml;
             });
-            lucide.createIcons();
+            safeCreateIcons();
 
             // EJECUTAR REVEAL DE TARJETAS AL HACER SCROLL CON GSAP
             setTimeout(() => {
+                if (typeof gsap === 'undefined') return;
+
                 // Animación de cards
                 gsap.utils.toArray('.product-card').forEach(card => {
                     gsap.fromTo(card, 
@@ -1459,6 +1494,16 @@
 
         // ANIMACIÓN DE ENTRADA INICIAL CON GSAP (ABOVE THE FOLD REVEAL)
         function playInitialGSAPAnimations() {
+            if (typeof gsap === 'undefined') {
+                // Si GSAP no carga, hacer elementos visibles inmediatamente
+                document.getElementById("promo-banner").style.opacity = 1;
+                document.getElementById("logo").style.opacity = 1;
+                document.getElementById("hero-title").style.opacity = 1;
+                document.getElementById("hero-desc").style.opacity = 1;
+                document.getElementById("hero-3d-container").style.opacity = 1;
+                document.querySelectorAll(".category-btn").forEach(btn => btn.style.opacity = 1);
+                return;
+            }
             const tl = gsap.timeline();
             tl.to("#promo-banner", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" });
             tl.to("#logo", { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, "-=0.2");
@@ -1473,9 +1518,10 @@
         function initGlobalInteractions() {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
-            // 1. Cabecera Inteligente (Smart Sticky Header)
+            // 1. Cabecera Inteligente (Smart Sticky Header) - Optimizado contra layout thrashing
             let lastScrollY = window.scrollY;
             const header = document.querySelector('header');
+            let isHeaderHidden = false;
             
             window.addEventListener('scroll', () => {
                 const currentScrollY = window.scrollY;
@@ -1483,42 +1529,72 @@
                     header.style.padding = "0.6rem 1rem";
                     header.style.backgroundColor = "rgba(12, 15, 23, 0.98)";
                     if (currentScrollY > lastScrollY && currentScrollY > 200) {
-                        // Scrolling down - hide header smoothly
-                        gsap.to(header, { yPercent: -120, duration: 0.3, ease: "power2.out" });
+                        if (!isHeaderHidden) {
+                            isHeaderHidden = true;
+                            if (typeof gsap !== 'undefined') {
+                                gsap.to(header, { yPercent: -120, duration: 0.3, ease: "power2.out" });
+                            } else {
+                                header.style.transform = "translateY(-120%)";
+                            }
+                        }
                     } else {
-                        // Scrolling up - show header smoothly
-                        gsap.to(header, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+                        if (isHeaderHidden) {
+                            isHeaderHidden = false;
+                            if (typeof gsap !== 'undefined') {
+                                gsap.to(header, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+                            } else {
+                                header.style.transform = "none";
+                            }
+                        }
                     }
                 } else {
                     header.style.padding = "1rem 1rem";
                     header.style.backgroundColor = "rgba(12, 15, 23, 0.85)";
-                    gsap.to(header, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+                    if (isHeaderHidden) {
+                        isHeaderHidden = false;
+                        if (typeof gsap !== 'undefined') {
+                            gsap.to(header, { yPercent: 0, duration: 0.3, ease: "power2.out" });
+                        } else {
+                            header.style.transform = "none";
+                        }
+                    }
                 }
                 lastScrollY = currentScrollY;
             }, { passive: true });
 
-            // 2. Cursor Follower (Desktop only) - Ultra Optimizado a 60/120 FPS sin JS listeners de Hover
+            // 2. Cursor Follower (Desktop only) - Con offset centrado corregido y alta fluidez
             const glow = document.getElementById('cursor-glow');
-            if (!isTouchDevice && window.innerWidth > 768) {
+            if (!isTouchDevice && window.innerWidth > 768 && glow) {
                 glow.style.display = 'block';
                 
-                const setGlowX = gsap.quickSetter(glow, "x", "px");
-                const setGlowY = gsap.quickSetter(glow, "y", "px");
-                
-                window.addEventListener('mousemove', (e) => {
-                    setGlowX(e.clientX);
-                    setGlowY(e.clientY);
-                });
+                if (typeof gsap !== 'undefined') {
+                    // Pre-configurar offset centrado para el quickSetter
+                    gsap.set(glow, { xPercent: -50, yPercent: -50 });
+                    const setGlowX = gsap.quickSetter(glow, "x", "px");
+                    const setGlowY = gsap.quickSetter(glow, "y", "px");
+                    
+                    window.addEventListener('mousemove', (e) => {
+                        setGlowX(e.clientX);
+                        setGlowY(e.clientY);
+                    }, { passive: true });
+                }
             }
 
-            // 3. Inclinación Interactiva 3D (3D Mouse Tilt) del Vinilo del Héroe (Desktop only)
+            // 3. Inclinación Interactiva 3D (3D Mouse Tilt) del Vinilo (Desktop only) - Optimizado contra layout thrashing continuo
             const heroBadge = document.querySelector('.hero-3d-badge');
-            if (heroBadge && !isTouchDevice && window.innerWidth > 768) {
+            if (heroBadge && !isTouchDevice && window.innerWidth > 768 && typeof gsap !== 'undefined') {
+                // Cachear las coordenadas del centro para evitar getBoundingClientRect continuo
+                let rect = heroBadge.getBoundingClientRect();
+                let badgeCenterX = rect.left + rect.width / 2;
+                let badgeCenterY = rect.top + rect.height / 2;
+                
+                window.addEventListener('resize', () => {
+                    rect = heroBadge.getBoundingClientRect();
+                    badgeCenterX = rect.left + rect.width / 2;
+                    badgeCenterY = rect.top + rect.height / 2;
+                }, { passive: true });
+
                 window.addEventListener('mousemove', (e) => {
-                    const rect = heroBadge.getBoundingClientRect();
-                    const badgeCenterX = rect.left + rect.width / 2;
-                    const badgeCenterY = rect.top + rect.height / 2;
-                    
                     const deltaX = e.clientX - badgeCenterX;
                     const deltaY = e.clientY - badgeCenterY;
                     
@@ -1533,29 +1609,37 @@
                         ease: "power2.out",
                         duration: 0.5
                     });
-                });
+                }, { passive: true });
 
-                // Retorno elástico al sacar el cursor
-                document.querySelector('.hero-3d-container').addEventListener('mouseleave', () => {
-                    gsap.to(heroBadge, {
-                        rotationX: 0,
-                        rotationY: 0,
-                        ease: "power3.out",
-                        duration: 0.8
+                // Retorno elástico al sacar el cursor del contenedor
+                const container3D = document.querySelector('.hero-3d-container');
+                if (container3D) {
+                    container3D.addEventListener('mouseleave', () => {
+                        gsap.to(heroBadge, {
+                            rotationX: 0,
+                            rotationY: 0,
+                            ease: "power3.out",
+                            duration: 0.8
+                        });
                     });
-                });
+                }
             }
         }
 
         // ABRIR O CERRAR EL DRAWER DEL CARRITO (CON TIMELINE EN CASCADA DE GSAP)
         window.toggleCartDrawer = function(open) {
+            // Escudo protector ultra confiable contra llamadas duplicadas
+            if (open === window.isCartOpen) return;
+            window.isCartOpen = open;
+
             const overlay = document.getElementById('cart-overlay');
             const drawer = document.getElementById('cart-drawer');
             const isMobile = window.innerWidth <= 768;
             
-            // Escudo protector contra llamadas duplicadas o animaciones simultáneas
-            const isOpen = drawer.style.display === "flex";
-            if (open === isOpen) return;
+            // Cancelar animaciones activas en el drawer para evitar conflictos
+            if (typeof gsap !== 'undefined') {
+                gsap.killTweensOf(drawer);
+            }
             
             if (open) {
                 overlay.classList.add('active');
@@ -1568,34 +1652,44 @@
                 
                 renderCartDrawerItems();
 
-                // Timeline de apertura GSAP
-                const tl = gsap.timeline();
-
-                if (isMobile) {
-                    tl.fromTo(drawer, { yPercent: 100, xPercent: 0 }, { yPercent: 0, xPercent: 0, duration: 0.5, ease: "power3.out" });
-                } else {
-                    tl.fromTo(drawer, { xPercent: 100, yPercent: 0 }, { xPercent: 0, yPercent: 0, duration: 0.5, ease: "power3.out" });
-                }
-
-                // Solo animar stagger de productos si existen en el carrito
-                const activeIds = Object.keys(cart);
-                if (activeIds.length > 0) {
-                    tl.from(".cart-item-row", { x: 30, opacity: 0, stagger: 0.08, duration: 0.4, ease: "power2.out" }, "-=0.25");
-                }
-                
-                tl.from(".delivery-section", { y: 20, opacity: 0, duration: 0.4, ease: "power2.out" }, "-=0.15");
-            } else {
-                gsap.to(drawer, {
-                    xPercent: isMobile ? 0 : 100,
-                    yPercent: isMobile ? 100 : 0,
-                    duration: 0.4,
-                    ease: "power3.in",
-                    onComplete: () => {
-                        overlay.classList.remove('active');
-                        document.body.classList.remove('lock-scroll');
-                        drawer.style.display = "none";
+                if (typeof gsap !== 'undefined') {
+                    // Timeline de apertura GSAP
+                    const tl = gsap.timeline();
+                    if (isMobile) {
+                        tl.fromTo(drawer, { yPercent: 100, xPercent: 0 }, { yPercent: 0, xPercent: 0, duration: 0.5, ease: "power3.out" });
+                    } else {
+                        tl.fromTo(drawer, { xPercent: 100, yPercent: 0 }, { xPercent: 0, yPercent: 0, duration: 0.5, ease: "power3.out" });
                     }
-                });
+
+                    // Solo animar stagger de productos si existen en el carrito
+                    const activeIds = Object.keys(cart);
+                    if (activeIds.length > 0) {
+                        tl.from(".cart-item-row", { x: 30, opacity: 0, stagger: 0.08, duration: 0.4, ease: "power2.out" }, "-=0.25");
+                    }
+                    tl.from(".delivery-section", { y: 20, opacity: 0, duration: 0.4, ease: "power2.out" }, "-=0.15");
+                } else {
+                    // Fallback directo si GSAP no está disponible
+                    drawer.style.transform = "none";
+                }
+            } else {
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(drawer, {
+                        xPercent: isMobile ? 0 : 100,
+                        yPercent: isMobile ? 100 : 0,
+                        duration: 0.4,
+                        ease: "power3.in",
+                        onComplete: () => {
+                            overlay.classList.remove('active');
+                            document.body.classList.remove('lock-scroll');
+                            drawer.style.display = "none";
+                        }
+                    });
+                } else {
+                    // Fallback directo si GSAP no está disponible
+                    overlay.classList.remove('active');
+                    document.body.classList.remove('lock-scroll');
+                    drawer.style.display = "none";
+                }
             }
         };
 
@@ -1614,7 +1708,7 @@
                         <p style="font-size: 0.85rem; margin-top: 0.5rem; max-width:280px; margin-left:auto; margin-right:auto;">Agrega algunos licores o cortes de carne para comenzar el show.</p>
                     </div>
                 `;
-                lucide.createIcons();
+                safeCreateIcons();
                 return;
             }
 
@@ -1652,7 +1746,7 @@
                 `;
                 listContainer.innerHTML += rowHtml;
             });
-            lucide.createIcons();
+            safeCreateIcons();
         }
 
         // ACTUALIZAR CANTIDAD EN EL CARRITO (CON REBOTE ELÁSTICO GSAP)
@@ -1670,15 +1764,16 @@
             const qtyElement = document.getElementById(`qty-${productId}`);
             if (qtyElement) {
                 qtyElement.innerText = newQty;
-                // Pequeño rebote elástico neón
-                gsap.fromTo(qtyElement, { scale: 1.4 }, { scale: 1, duration: 0.4, ease: "back.out(2)" });
+                // Pequeño rebote elástico neón si GSAP está cargado
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(qtyElement, { scale: 1.4 }, { scale: 1, duration: 0.4, ease: "back.out(2)" });
+                }
             }
             
             updateCartSummary();
             
             // Si el drawer está abierto, refrescar su contenido
-            const drawer = document.getElementById('cart-drawer');
-            if (drawer.style.display === 'flex') {
+            if (window.isCartOpen) {
                 renderCartDrawerItems();
             }
         };
@@ -1719,12 +1814,16 @@
             
             if (itemsCount > 0) {
                 if (!cartBar.classList.contains('active')) {
-                    // Animación de aparición flotante con GSAP
+                    // Animación de aparición flotante con GSAP si está disponible
                     cartBar.classList.add('active');
-                    gsap.fromTo(cartBar, { y: 100, scale: 0.9 }, { y: 0, scale: 1, duration: 0.5, ease: "back.out(1.2)" });
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(cartBar, { y: 100, scale: 0.9 }, { y: 0, scale: 1, duration: 0.5, ease: "back.out(1.2)" });
+                    }
                 } else {
                     // Si ya está activo, rebote elástico rápido de pulso para indicar actualización
-                    gsap.fromTo(cartBar, { scale: 1.04 }, { scale: 1, duration: 0.4, ease: "back.out(2.5)" });
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(cartBar, { scale: 1.04 }, { scale: 1, duration: 0.4, ease: "back.out(2.5)" });
+                    }
                 }
             } else {
                 cartBar.classList.remove('active');
@@ -1761,7 +1860,7 @@
             indicator.className = "gps-status";
             indicator.innerHTML = '<i data-lucide="loader" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"></i> Obteniendo señal GPS...';
             indicator.style.display = "inline-flex";
-            lucide.createIcons();
+            safeCreateIcons();
 
             if (!navigator.geolocation) {
                 indicator.className = "gps-status error";
@@ -1777,7 +1876,7 @@
                     
                     indicator.className = "gps-status success";
                     indicator.innerHTML = '✅ ¡Ubicación capturada con éxito! 📍';
-                    lucide.createIcons();
+                    safeCreateIcons();
                 },
                 (error) => {
                     console.error("Error capturando ubicación GPS:", error);
@@ -1796,7 +1895,7 @@
                         default:
                             indicator.innerHTML = '❌ Error al capturar tu ubicación.';
                     }
-                    lucide.createIcons();
+                    safeCreateIcons();
                 },
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
