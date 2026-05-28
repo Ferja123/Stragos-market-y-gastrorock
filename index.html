@@ -67,15 +67,31 @@
             -webkit-tap-highlight-color: transparent; /* Quita el destello al tocar en móvil */
         }
 
+        @keyframes auroraBreathe {
+            0% {
+                background-image: 
+                    radial-gradient(circle at 10% 20%, hsla(355, 85%, 55%, 0.06) 0%, transparent 45%),
+                    radial-gradient(circle at 90% 80%, hsla(35, 90%, 55%, 0.04) 0%, transparent 40%);
+            }
+            50% {
+                background-image: 
+                    radial-gradient(circle at 15% 25%, hsla(355, 85%, 55%, 0.04) 0%, transparent 40%),
+                    radial-gradient(circle at 85% 75%, hsla(35, 90%, 55%, 0.06) 0%, transparent 45%);
+            }
+            100% {
+                background-image: 
+                    radial-gradient(circle at 10% 20%, hsla(355, 85%, 55%, 0.06) 0%, transparent 45%),
+                    radial-gradient(circle at 90% 80%, hsla(35, 90%, 55%, 0.04) 0%, transparent 40%);
+            }
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, hsla(355, 85%, 55%, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, hsla(35, 90%, 55%, 0.05) 0%, transparent 40%);
             background-attachment: fixed;
+            animation: auroraBreathe 20s ease-in-out infinite alternate;
         }
 
         /* Bloquear scroll de fondo */
@@ -1046,6 +1062,9 @@
 </head>
 <body>
 
+    <!-- Lightweight Interactive Rock Ember Background Canvas -->
+    <canvas id="bg-particles" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none;"></canvas>
+
     <!-- Ambient Glow Cursor Follower (Solo Desktop) -->
     <div class="cursor-glow" id="cursor-glow"></div>
 
@@ -1957,11 +1976,121 @@
             window.open(waUrl, '_blank');
         };
 
+        // LIGHTWEIGHT INTERACTIVE PARTICLE BG (Concierto de Rock Embers / Sparks)
+        function initParticleBackground() {
+            const canvas = document.getElementById('bg-particles');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationFrameId;
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const particleCount = isTouchDevice ? 25 : 65; // Reducir en celulares para máximo rendimiento
+
+            let mouse = { x: null, y: null, radius: 120 };
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            if (!isTouchDevice) {
+                window.addEventListener('mousemove', (e) => {
+                    mouse.x = e.clientX;
+                    mouse.y = e.clientY;
+                }, { passive: true });
+
+                window.addEventListener('mouseleave', () => {
+                    mouse.x = null;
+                    mouse.y = null;
+                }, { passive: true });
+            }
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                    // Colocar inicialmente en posiciones aleatorias de toda la pantalla
+                    this.y = Math.random() * canvas.height;
+                }
+
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = canvas.height + Math.random() * 50;
+                    this.size = Math.random() * 2.5 + 0.8;
+                    this.speedY = -(Math.random() * 0.8 + 0.3);
+                    this.speedX = Math.random() * 0.4 - 0.2;
+                    this.colorValue = Math.random();
+                    // Tonos rojo neón y ámbar rockero
+                    this.color = this.colorValue > 0.4 
+                        ? `hsla(355, 85%, 55%, ${Math.random() * 0.4 + 0.2})`  // Rojo Neón
+                        : `hsla(35, 90%, 55%, ${Math.random() * 0.4 + 0.2})`;  // Ámbar Rockero
+                    this.wobble = Math.random() * 0.02;
+                    this.wobbleSpeed = Math.random() * 0.02 + 0.005;
+                }
+
+                update() {
+                    this.y += this.speedY;
+                    this.x += this.speedX + Math.sin(this.y * this.wobble) * 0.15;
+
+                    // Interacción física con el mouse (repulsión suave)
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const dx = this.x - mouse.x;
+                        const dy = this.y - mouse.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < mouse.radius) {
+                            const force = (mouse.radius - distance) / mouse.radius;
+                            const forceX = (dx / distance) * force * 1.8;
+                            const forceY = (dy / distance) * force * 1.8;
+                            this.x += forceX;
+                            this.y += forceY;
+                        }
+                    }
+
+                    // Reset si sale de la pantalla
+                    if (this.y < -10 || this.x < -10 || this.x > canvas.width + 10) {
+                        this.reset();
+                    }
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = this.size * 3;
+                    ctx.shadowColor = this.colorValue > 0.4 ? 'hsl(355, 85%, 55%)' : 'hsl(35, 90%, 55%)';
+                    ctx.fill();
+                    ctx.shadowBlur = 0; // Reset shadow for other drawings
+                }
+            }
+
+            function init() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                animationFrameId = requestAnimationFrame(animate);
+            }
+
+            init();
+            animate();
+        }
+
         // RENDERIZAR EN EL LOGIN DE LA PÁGINA
         document.addEventListener('DOMContentLoaded', () => {
             renderProducts();
             playInitialGSAPAnimations();
             initGlobalInteractions();
+            initParticleBackground();
         });
     </script>
     <style>
