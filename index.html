@@ -1595,6 +1595,10 @@
                 desc: 'Tequila de gran cuerpo y sabor tradicional elaborado con agave azul seleccionado.',
                 image: 'images/tequila_bottle.png'
             },
+            '4 GALLOS': {
+                desc: 'Pisco premium peruano de uvas seleccionadas de Ica. Mosto verde, de aroma y cuerpo excepcionales.',
+                image: 'images/pisco_peruano.png'
+            },
             'PISCO': {
                 desc: 'Pisco puro peruano de aroma fino y sabor balanceado, ideal para preparar el clásico Pisco Sour.',
                 image: 'images/pisco_peruano.png'
@@ -1854,8 +1858,9 @@
                     let image = '';
                     let badge = '';
                     
-                    // Buscar detalles de la marca
-                    for (const brand in BRAND_DETAILS) {
+                    // Buscar detalles de la marca (ordenados por longitud de clave de mayor a menor para evitar falsos positivos)
+                    const sortedBrands = Object.keys(BRAND_DETAILS).sort((a, b) => b.length - a.length);
+                    for (const brand of sortedBrands) {
                         if (nameUpper.includes(brand)) {
                             desc = BRAND_DETAILS[brand].desc;
                             image = BRAND_DETAILS[brand].image;
