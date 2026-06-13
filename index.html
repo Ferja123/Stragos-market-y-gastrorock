@@ -1711,23 +1711,40 @@
             let iconSvg = "";
             let glowColor = "";
             
+            // Generar un hash numérico simple a partir del nombre del producto para variar tonalidades
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
             if (category === "licores") {
-                bgGradient = "linear-gradient(135deg, #2a080d 0%, #0d0608 100%)";
-                glowColor = "hsl(355, 85%, 55%)";
+                // Hue base rojizo/borgoña variado por hash (rango de 330 a 360 y de 0 a 20)
+                const hue = Math.abs(hash % 50) - 20; // -20 a 30 (cerca de rojo)
+                const finalHue = hue < 0 ? 360 + hue : hue;
+                bgGradient = `linear-gradient(135deg, hsl(${finalHue}, 60%, 10%) 0%, #0d0608 100%)`;
+                glowColor = `hsl(${finalHue}, 85%, 55%)`;
                 iconSvg = `<path d="M10 2h4v3h-4z M12 5c-1.66 0-3 1.34-3 3v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V8c0-1.66-1.34-3-3-3z M11 9h2v2h-2z M11 13h2v2h-2z" fill="${glowColor}" filter="drop-shadow(0 0 8px ${glowColor})"/>`;
             } else if (category === "bebidas") {
-                bgGradient = "linear-gradient(135deg, #08212a 0%, #060e11 100%)";
-                glowColor = "hsl(180, 85%, 45%)";
+                // Hue base azul/cian/verde variado por hash (rango de 160 a 240)
+                const hue = 160 + Math.abs(hash % 80);
+                bgGradient = `linear-gradient(135deg, hsl(${hue}, 60%, 8%) 0%, #060e11 100%)`;
+                glowColor = `hsl(${hue}, 85%, 45%)`;
                 iconSvg = `<path d="M6 2h12v2H6zm2 4h8l-1.5 14h-5L8 6zm3 4h2v6h-2z" fill="${glowColor}" filter="drop-shadow(0 0 8px ${glowColor})"/>`;
             } else { // snacks
-                bgGradient = "linear-gradient(135deg, #2a1b08 0%, #110c06 100%)";
-                glowColor = "hsl(35, 90%, 55%)";
+                // Hue base naranja/amarillo/dorado variado por hash (rango de 25 a 70)
+                const hue = 25 + Math.abs(hash % 45);
+                bgGradient = `linear-gradient(135deg, hsl(${hue}, 60%, 8%) 0%, #110c06 100%)`;
+                glowColor = `hsl(${hue}, 90%, 55%)`;
                 iconSvg = `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-3.5 6c.83 0 1.5.67 1.5 1.5S9.33 11 8.5 11 7 10.33 7 9.5 7.67 8 8.5 8zm.5 8c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm6-5c.83 0 1.5.67 1.5 1.5S17.33 14 16.5 14 15 13.33 15 12.5 15.67 11 16.5 11z" fill="${glowColor}" filter="drop-shadow(0 0 8px ${glowColor})"/>`;
             }
             
+            // Añadir un sutil texto decorativo al fondo de la tarjeta con las iniciales o el nombre del producto en baja opacidad
+            const shortName = name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+            
             const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%" style="background:${bgGradient};display:flex;align-items:center;justify-content:center;">
                 <rect width="24" height="24" fill="none"/>
-                <g transform="scale(0.5) translate(12, 12)">
+                <text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" fill="${glowColor}" opacity="0.1" font-family="'Syne', sans-serif" font-weight="900" font-size="2.5" style="letter-spacing: 0.1px;">${shortName}</text>
+                <g transform="scale(0.45) translate(14.5, 14.5)">
                     ${iconSvg}
                 </g>
             </svg>`;
