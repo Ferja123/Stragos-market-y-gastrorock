@@ -1561,15 +1561,15 @@
             },
             'OLD PARR': {
                 desc: 'Whisky escocés clásico de sabor suave, afrutado y con una nota profunda de roble.',
-                image: 'images/whisky_red_label.png'
+                image: 'images/whisky_old_parr.png'
             },
             'CARTAVIO': {
                 desc: 'Ron clásico elaborado en el norte del Perú, con barricas seleccionadas que le otorgan un cuerpo balanceado.',
-                image: 'images/ron_cartavio.png'
+                image: 'images/ron_cartavio_premium.png'
             },
             'FLOR DE CAÑA': {
                 desc: 'Ron nicaragüense ultra premium envejecido de forma natural, de sabor excepcionalmente suave y elegante.',
-                image: 'images/ron_cartavio.png'
+                image: 'images/ron_cartavio_premium.png'
             },
             'PILSEN': {
                 desc: 'La cerveza de la verdadera amistad en el Perú. Refrescante, helada y con el lúpulo perfecto.',
@@ -1580,20 +1580,20 @@
                 image: 'images/cerveza_corona.png'
             },
             'CUSQUEÑA': {
-                desc: 'Cerveza peruana premium elaborada con 100% pura malta de cebada y lúpulos selectos.',
-                image: 'images/cerveza_artesanal.png'
+                desc: 'Cerveza peruana premium de gran cuerpo elaborada con 100% pura malta de cebada y lúpulos selectos.',
+                image: 'images/cerveza_cusquena.png'
             },
             'CRISTAL': {
                 desc: 'La cerveza del Perú, refrescante de cuerpo equilibrado para celebrar y disfrutar con los amigos.',
-                image: 'images/cerveza_artesanal.png'
+                image: 'images/cerveza_cristal.png'
             },
             'SMIRNOFF': {
                 desc: 'Vodka triple destilado de pureza extraordinaria. Ideal para combinados y coctelería.',
-                image: 'images/ron_cartavio.png'
+                image: 'images/vodka_smirnoff.png'
             },
             'TEQUILA': {
                 desc: 'Tequila de gran cuerpo y sabor tradicional elaborado con agave azul seleccionado.',
-                image: 'images/ron_cartavio.png'
+                image: 'images/tequila_bottle.png'
             },
             'PISCO': {
                 desc: 'Pisco puro peruano de aroma fino y sabor balanceado, ideal para preparar el clásico Pisco Sour.',
@@ -1990,7 +1990,44 @@
             }
         }
 
-        // RENDERIZAR PRODUCTOS EN EL DOM
+        // Helper to classify products into subcategories
+        function getSubcategory(product) {
+            const nameUpper = product.name.toUpperCase();
+            const cat = product.category;
+            
+            if (cat === 'licores') {
+                if (nameUpper.includes('WHISKY') || nameUpper.includes('JOHNNIE') || nameUpper.includes('RED LABEL') || nameUpper.includes('BLACK LABEL') || nameUpper.includes('OLD PARR') || nameUpper.includes('OLD TIMES') || nameUpper.includes('CHIVAS') || nameUpper.includes('JACK DANIEL') || nameUpper.includes('JOHNY WALKER')) return 'Whiskys';
+                if (nameUpper.includes('RON') || nameUpper.includes('CARTAVIO') || nameUpper.includes('FLOR DE CAÑA') || nameUpper.includes('BACARDI') || nameUpper.includes('BACCARDI')) return 'Rones';
+                if (nameUpper.includes('CERVEZA') || nameUpper.includes('PILSEN') || nameUpper.includes('CORONA') || nameUpper.includes('CUSQUEÑA') || nameUpper.includes('CRISTAL') || nameUpper.includes('HEINEKEN') || nameUpper.includes('TRIGO')) return 'Cervezas';
+                if (nameUpper.includes('TEQUILA') || nameUpper.includes('JIMADOR') || nameUpper.includes('JOSE CUERVO') || nameUpper.includes('HERRADURA')) return 'Tequilas';
+                if (nameUpper.includes('PISCO') || nameUpper.includes('TABERNERO') || nameUpper.includes('QUEIROLO')) return 'Piscos';
+                if (nameUpper.includes('VINO') || nameUpper.includes('BORGOÑA') || nameUpper.includes('ROSE') || nameUpper.includes('ROSÉ') || nameUpper.includes('MISIONES') || nameUpper.includes('TRAPICHE') || nameUpper.includes('DON VALENTIN')) return 'Vinos';
+                if (nameUpper.includes('VODKA') || nameUpper.includes('SMIRNOFF') || nameUpper.includes('RUSSKAYA') || nameUpper.includes('SKYY')) return 'Vodkas';
+                if (nameUpper.includes('JAGERMEISTER') || nameUpper.includes('LICOR') || nameUpper.includes('GIN') || nameUpper.includes('GINEBRA') || nameUpper.includes('CAMPARI') || nameUpper.includes('FERNET') || nameUpper.includes('TRES PLUMAS') || nameUpper.includes('AMARETTO') || nameUpper.includes('ANIS') || nameUpper.includes('APEROL') || nameUpper.includes('MALIBU')) return 'Licores & Destilados';
+                return 'Otros Licores';
+            }
+            if (cat === 'bebidas') {
+                if (nameUpper.includes('AGUA') || nameUpper.includes('SAN LUIS') || nameUpper.includes('SAN MATEO') || nameUpper.includes('CIELO')) return 'Aguas';
+                if (nameUpper.includes('COCA COLA') || nameUpper.includes('INCA KOLA') || nameUpper.includes('FANTA') || nameUpper.includes('SPRITE') || nameUpper.includes('PEPSI') || nameUpper.includes('SODA')) return 'Gaseosas';
+                if (nameUpper.includes('VOLT') || nameUpper.includes('RED BULL') || nameUpper.includes('MONSTER') || nameUpper.includes('POWER ADE') || nameUpper.includes('GATORADE')) return 'Energizantes & Deportivos';
+                if (nameUpper.includes('JUGO') || nameUpper.includes('FRUGOS') || nameUpper.includes('PULP') || nameUpper.includes('MILKIS') || nameUpper.includes('YOGURT') || nameUpper.includes('LECHE') || nameUpper.includes('GLORIA')) return 'Jugos, Lácteos & Otros';
+                return 'Otras Bebidas';
+            }
+            if (cat === 'snacks') {
+                if (nameUpper.includes('PAPA') || nameUpper.includes('LAYS') || nameUpper.includes('LAY\'S') || nameUpper.includes('INKA CHIPS') || nameUpper.includes('TIYAPUY') || nameUpper.includes('CHIFLE')) return 'Papas & Chips';
+                if (nameUpper.includes('DORITOS') || nameUpper.includes('TAKIS') || nameUpper.includes('TOR TEES') || nameUpper.includes('TOR-TEES') || nameUpper.includes('CHEETOS') || nameUpper.includes('CHISITO') || nameUpper.includes('PIQUEO')) return 'Tortillas & Extruidos';
+                if (nameUpper.includes('GALLETA') || nameUpper.includes('SODA') || nameUpper.includes('GLACITAS') || nameUpper.includes('PICARAS') || nameUpper.includes('CASINO') || nameUpper.includes('MARGARITA') || nameUpper.includes('TRENTO') || nameUpper.includes('OREO') || nameUpper.includes('RITZ') || nameUpper.includes('CLUB SOCIAL')) return 'Galletas & Harinas';
+                if (nameUpper.includes('CHOCOLATE') || nameUpper.includes('SUBLIME') || nameUpper.includes('PRINCESA') || nameUpper.includes('TRIANGULO') || nameUpper.includes('VIZZIO') || nameUpper.includes('DULCE') || nameUpper.includes('BOMBON') || nameUpper.includes('BON O BON') || nameUpper.includes('GOMITAS') || nameUpper.includes('CARAMELO') || nameUpper.includes('TOFFEE') || nameUpper.includes('TIC TAC')) return 'Chocolates & Dulces';
+                if (nameUpper.includes('MANI') || nameUpper.includes('FRUTOS SECOS') || nameUpper.includes('ALMENDRAS') || nameUpper.includes('PISTACHOS')) return 'Frutos Secos';
+                return 'Varios Snacks';
+            }
+            if (cat === 'carnes') {
+                return 'Gastro Rock Specials';
+            }
+            return 'Otros';
+        }
+
+        // RENDERIZAR PRODUCTOS EN EL DOM (Con sub-categorización y orden alfabético)
         window.renderProducts = function(filteredList = null) {
             const isSearching = filteredList !== null;
             const categories = ['licores', 'bebidas', 'snacks', 'carnes'];
@@ -1998,8 +2035,7 @@
             categories.forEach(cat => {
                 const grid = document.getElementById(`grid-${cat}`);
                 if (grid) {
-                    const cards = grid.querySelectorAll('.product-card');
-                    cards.forEach(card => card.remove());
+                    grid.innerHTML = ''; // Limpiamos todo
                 }
             });
             
@@ -2027,7 +2063,9 @@
                     return;
                 }
                 
-                filteredList.forEach(product => {
+                // En búsqueda ordenamos alfabéticamente
+                const sortedSearchList = [...filteredList].sort((a, b) => a.name.localeCompare(b.name));
+                sortedSearchList.forEach(product => {
                     renderProductCard(searchGrid, product);
                 });
             } else {
@@ -2045,18 +2083,54 @@
                     
                     const catProducts = products.filter(p => p.category === cat);
                     const limit = visibleLimits[cat];
-                    const visibleProducts = catProducts.slice(0, limit);
                     
-                    visibleProducts.forEach(product => {
-                        renderProductCard(grid, product);
-                    });
+                    // Ordenar todos los productos de esta categoría alfabéticamente primero
+                    const sortedCatProducts = [...catProducts].sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    // Si no estamos mostrando todos (es decir, limit es el inicial pequeño), renderizamos normal
+                    // Si mostramos todos (limit es grande), agrupamos por subcategoría
+                    if (limit < 50 && sortedCatProducts.length > limit) {
+                        // Modo vista previa (sin cabeceras de subcategoría para no saturar al inicio)
+                        const visibleProducts = sortedCatProducts.slice(0, limit);
+                        visibleProducts.forEach(product => {
+                            renderProductCard(grid, product);
+                        });
+                    } else {
+                        // Modo vista completa: Agrupar por subcategoría
+                        const groups = {};
+                        sortedCatProducts.forEach(product => {
+                            const sub = getSubcategory(product);
+                            if (!groups[sub]) groups[sub] = [];
+                            groups[sub].push(product);
+                        });
+                        
+                        // Renderizar las agrupaciones
+                        Object.keys(groups).sort().forEach(subName => {
+                            const groupProds = groups[subName];
+                            if (groupProds.length === 0) return;
+                            
+                            // Insertar encabezado de subcategoría que ocupa toda la fila del grid
+                            const headerHtml = `
+                                <div class="subcategory-header" style="grid-column: 1/-1; margin: 1.5rem 0 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <h3 style="font-family: 'Syne', sans-serif; font-size: 1.15rem; color: var(--secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
+                                        ⚡ ${subName} (${groupProds.length})
+                                    </h3>
+                                </div>
+                            `;
+                            grid.insertAdjacentHTML('beforeend', headerHtml);
+                            
+                            groupProds.forEach(product => {
+                                renderProductCard(grid, product);
+                            });
+                        });
+                    }
                     
                     const moreContainer = document.getElementById(`more-container-${cat}`);
                     if (moreContainer) {
                         if (catProducts.length > limit) {
                             moreContainer.style.display = 'flex';
                             moreContainer.querySelector('.btn-show-more').innerHTML = `
-                                Ver más ${cat} (${catProducts.length - limit})
+                                Ver todos y ordenar por tipo (${catProducts.length})
                                 <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
                             `;
                         } else {
