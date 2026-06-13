@@ -568,6 +568,71 @@
             font-size: 0.95rem;
         }
 
+        /* --- SEARCH & SKELETONS --- */
+        .search-container {
+            max-width: 600px;
+            margin: 1.5rem auto 0.5rem;
+            padding: 0 1rem;
+            transition: var(--transition-smooth);
+        }
+        .search-container input:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 15px var(--primary-glow) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+        }
+        .skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+            width: 100%;
+        }
+        .skeleton-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            height: 320px;
+            overflow: hidden;
+            position: relative;
+        }
+        .skeleton-card::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+        .show-more-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            width: 100%;
+        }
+        .btn-show-more {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-show-more:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-neon);
+        }
+
         /* --- BARRA FLOTANTE DEL CARRITO (CON SOPORTE PARA SAFE AREA) --- */
         .cart-bar-floating {
             position: fixed;
@@ -1224,8 +1289,29 @@
         </button>
     </nav>
 
+    <!-- BUSCADOR DE PRODUCTOS EN TIEMPO REAL -->
+    <div class="search-container" style="max-width: 600px; margin: 1.5rem auto 0.5rem; padding: 0 1rem; opacity: 1; transform: none;" id="search-container">
+        <div style="position: relative; display: flex; align-items: center;">
+            <i data-lucide="search" style="position: absolute; left: 1.2rem; color: var(--text-muted); width: 18px; height: 18px;"></i>
+            <input type="text" id="inventory-search" placeholder="Busca licores, bebidas, snacks..." 
+                   style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 50px; color: var(--text-main); font-family: inherit; font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+            <button id="clear-search" onclick="clearSearchInput()" style="position: absolute; right: 1.2rem; background: none; border: none; color: var(--text-muted); cursor: pointer; display: none; align-items: center; justify-content: center;">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="main-container">
+
+        <!-- SECCIÓN: RESULTADOS DE BÚSQUEDA -->
+        <section id="search-results" style="display: none;">
+            <h2 class="section-title">
+                <i data-lucide="search" style="color: var(--secondary);"></i> Resultados de Búsqueda
+                <div class="section-title-line"></div>
+            </h2>
+            <div class="products-grid" id="grid-search-results"></div>
+        </section>
 
         <!-- CATEGORÍA: LICORES -->
         <section id="licores">
@@ -1233,7 +1319,21 @@
                 <i data-lucide="beer" style="color: var(--primary);"></i> Licores Helados
                 <div class="section-title-line"></div>
             </h2>
-            <div class="products-grid" id="grid-licores"></div>
+            <div class="products-grid" id="grid-licores">
+                <!-- Skeletons -->
+                <div class="skeleton-grid" id="skeleton-licores">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <div class="show-more-container" id="more-container-licores" style="display: none;">
+                <button class="btn-show-more" onclick="showAllCategory('licores')">
+                    Ver todos los licores
+                    <i data-lucide="chevron-down"></i>
+                </button>
+            </div>
         </section>
 
         <!-- CATEGORÍA: BEBIDAS -->
@@ -1242,7 +1342,21 @@
                 <i data-lucide="cup-soda" style="color: var(--primary);"></i> Bebidas & Refrescos
                 <div class="section-title-line"></div>
             </h2>
-            <div class="products-grid" id="grid-bebidas"></div>
+            <div class="products-grid" id="grid-bebidas">
+                <!-- Skeletons -->
+                <div class="skeleton-grid" id="skeleton-bebidas">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <div class="show-more-container" id="more-container-bebidas" style="display: none;">
+                <button class="btn-show-more" onclick="showAllCategory('bebidas')">
+                    Ver todas las bebidas
+                    <i data-lucide="chevron-down"></i>
+                </button>
+            </div>
         </section>
 
         <!-- CATEGORÍA: SNACKS -->
@@ -1251,7 +1365,21 @@
                 <i data-lucide="cookie" style="color: var(--primary);"></i> Snacks & Complementos
                 <div class="section-title-line"></div>
             </h2>
-            <div class="products-grid" id="grid-snacks"></div>
+            <div class="products-grid" id="grid-snacks">
+                <!-- Skeletons -->
+                <div class="skeleton-grid" id="skeleton-snacks">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <div class="show-more-container" id="more-container-snacks" style="display: none;">
+                <button class="btn-show-more" onclick="showAllCategory('snacks')">
+                    Ver todos los snacks
+                    <i data-lucide="chevron-down"></i>
+                </button>
+            </div>
         </section>
 
         <!-- CATEGORÍA: CARNES -->
@@ -1373,90 +1501,25 @@
         // CONFIGURACIÓN: Reemplazar con el número real de tu Builderbot (con prefijo de país, sin +)
         const WHATSAPP_PHONE = "51972285101";
 
+        // Función de renderizado seguro de iconos de Lucide
+        function safeCreateIcons() {
+            try {
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.warn("Lucide icons failed to render:", e);
+            }
+        }
+
+        // ESTADO DEL CARRITO Y GPS
+        let cart = {};
+        let capturedGpsLink = "";
+        window.isCartOpen = false;
+
         // BASE DE DATOS DE PRODUCTOS CON IMÁGENES PREMIUM
-        const products = [
-            // Licores
-            { 
-                id: "LIC-001", 
-                name: "Cerveza Artesanal Porter Moyobamba", 
-                price: 12.00, 
-                category: "licores", 
-                badge: "Artesanal",
-                image: "images/cerveza_artesanal.png",
-                featured: true,
-                desc: "Nuestra cerveza negra insignia de cuerpo robusto y notas a cacao tostado. Una oda al rock pesado."
-            },
-            { 
-                id: "LIC-002", 
-                name: "Whisky Johnnie Walker Red Label", 
-                price: 75.00, 
-                category: "licores", 
-                badge: "Popular",
-                image: "images/whisky_red_label.png" 
-            },
-            { 
-                id: "LIC-003", 
-                name: "Ron Cartavio Solera 12 Años", 
-                price: 45.00, 
-                category: "licores", 
-                badge: "Premium",
-                image: "images/ron_cartavio.png" 
-            },
-            // Bebidas
-            { 
-                id: "BEB-001", 
-                name: "Coca-Cola Personal Vidrio", 
-                price: 3.50, 
-                category: "bebidas", 
-                badge: "Helada",
-                image: "images/coca_cola.png",
-                featured: true,
-                desc: "La clásica compañera de tus noches de concierto en envase de vidrio helado tradicional."
-            },
-            { 
-                id: "BEB-002", 
-                name: "Agua San Mateo con Gas", 
-                price: 2.50, 
-                category: "bebidas", 
-                badge: "Mineral",
-                image: "images/agua_gas.png" 
-            },
-            { 
-                id: "BEB-003", 
-                name: "Energy Drink Red Bull", 
-                price: 9.00, 
-                category: "bebidas", 
-                badge: "Poder",
-                image: "images/red_bull.png" 
-            },
-            // Snacks
-            { 
-                id: "SNA-001", 
-                name: "Papas Nativas con Sal de Mar", 
-                price: 5.50, 
-                category: "snacks", 
-                badge: "Crujiente",
-                image: "images/papas_nativas.png",
-                featured: true,
-                desc: "Crocantes papas seleccionadas con piel, sazonadas a mano con cristales de sal marina."
-            },
-            { 
-                id: "SNA-002", 
-                name: "Mix de Frutos Secos Picantes", 
-                price: 7.00, 
-                category: "snacks", 
-                badge: "Ideal Licores",
-                image: "images/frutos_secos.png" 
-            },
-            { 
-                id: "SNA-003", 
-                name: "Nachos con Salsa Cheddar", 
-                price: 8.50, 
-                category: "snacks", 
-                badge: "Gourmet",
-                image: "images/nachos_cheddar.png" 
-            },
-            // Carnes / Gastro Specials
+        // BASE DE DATOS ESTÁTICA PARA CARNES (Restaurante Gastro Rock Specials)
+        const staticCarnes = [
             { 
                 id: "CAR-001", 
                 name: "Costillas de Cerdo Ahumadas BBQ", 
@@ -1483,141 +1546,572 @@
                 badge: "Top Venta",
                 image: "images/hamburguesa_angus.png" 
             }
+        ];        const BRAND_DETAILS = {
+            'JOHNNIE WALKER': {
+                desc: 'El whisky escocés más vendido del mundo. Mezcla audaz de whiskies ahumados y picantes.',
+                image: 'images/whisky_red_label.png'
+            },
+            'RED LABEL': {
+                desc: 'Whisky escocés Johnnie Walker Red Label, vibrante, ahumado y con notas picantes.',
+                image: 'images/whisky_red_label.png'
+            },
+            'BLACK LABEL': {
+                desc: 'Whisky escocés Johnnie Walker Black Label de 12 años. Notas de frutos secos, vainilla y un ahumado distinguido.',
+                image: 'images/whisky_black_label.png'
+            },
+            'OLD PARR': {
+                desc: 'Whisky escocés clásico de sabor suave, afrutado y con una nota profunda de roble.',
+                image: 'images/whisky_red_label.png'
+            },
+            'CARTAVIO': {
+                desc: 'Ron clásico elaborado en el norte del Perú, con barricas seleccionadas que le otorgan un cuerpo balanceado.',
+                image: 'images/ron_cartavio.png'
+            },
+            'FLOR DE CAÑA': {
+                desc: 'Ron nicaragüense ultra premium envejecido de forma natural, de sabor excepcionalmente suave y elegante.',
+                image: 'images/ron_cartavio.png'
+            },
+            'PILSEN': {
+                desc: 'La cerveza de la verdadera amistad en el Perú. Refrescante, helada y con el lúpulo perfecto.',
+                image: 'images/cerveza_pilsen.png'
+            },
+            'CORONA': {
+                desc: 'Cerveza mexicana premium suave y refrescante, perfecta para disfrutar helada con una rodaja de limón.',
+                image: 'images/cerveza_corona.png'
+            },
+            'CUSQUEÑA': {
+                desc: 'Cerveza peruana premium elaborada con 100% pura malta de cebada y lúpulos selectos.',
+                image: 'images/cerveza_artesanal.png'
+            },
+            'CRISTAL': {
+                desc: 'La cerveza del Perú, refrescante de cuerpo equilibrado para celebrar y disfrutar con los amigos.',
+                image: 'images/cerveza_artesanal.png'
+            },
+            'SMIRNOFF': {
+                desc: 'Vodka triple destilado de pureza extraordinaria. Ideal para combinados y coctelería.',
+                image: 'images/ron_cartavio.png'
+            },
+            'TEQUILA': {
+                desc: 'Tequila de gran cuerpo y sabor tradicional elaborado con agave azul seleccionado.',
+                image: 'images/ron_cartavio.png'
+            },
+            'PISCO': {
+                desc: 'Pisco puro peruano de aroma fino y sabor balanceado, ideal para preparar el clásico Pisco Sour.',
+                image: 'images/pisco_peruano.png'
+            },
+            'BORGOÑA': {
+                desc: 'Vino peruano dulce y afrutado elaborado con uvas Borgoña. Perfecto para cualquier ocasión.',
+                image: 'images/vino_borgona.png'
+            },
+            'ROSE': {
+                desc: 'Vino rosado semi-seco de notas frutales y florales, refrescante y con un final elegante.',
+                image: 'images/combo_san_juan_old_times.png'
+            },
+            'ROSÉ': {
+                desc: 'Vino rosado semi-seco de notas frutales y florales, refrescante y con un final elegante.',
+                image: 'images/combo_san_juan_old_times.png'
+            },
+            'JAGERMEISTER': {
+                desc: 'Licor alemán de hierbas elaborado con una receta secreta de 56 botánicos. Se sirve helado.',
+                image: 'images/licor_jagermeister.png'
+            },
+            'COCA COLA': {
+                desc: 'La bebida refrescante más famosa del mundo. Sabor original y burbujeante, lista para acompañar tus comidas.',
+                image: 'images/coca_cola.png'
+            },
+            'INCA KOLA': {
+                desc: 'La bebida de sabor nacional. Con su inconfundible color dorado y sabor único que combina con todo.',
+                image: 'images/inca_kola.png'
+            },
+            'SAN LUIS': {
+                desc: 'Agua de mesa pura y ligera, ideal para hidratarte en cualquier momento del día.',
+                image: 'images/agua_gas.png'
+            },
+            'SAN MATEO': {
+                desc: 'Agua mineral de manantial filtrada de manera natural a más de 3000 metros de altura.',
+                image: 'images/agua_gas.png'
+            },
+            'RED BULL': {
+                desc: 'Bebida energizante que revitaliza cuerpo y mente, ideal para tus largas jornadas y noches rockeras.',
+                image: 'images/red_bull.png'
+            },
+            'VOLT': {
+                desc: 'Bebida energizante de alta potencia para darte el impulso extra que necesitas en tu día.',
+                image: 'images/red_bull.png'
+            },
+            'LAYS': {
+                desc: 'Papas fritas clásicas, crujientes y saladas. El snack perfecto para tus reuniones.',
+                image: 'images/papas_nativas.png'
+            },
+            'LAY\'S': {
+                desc: 'Papas fritas clásicas, crujientes y saladas. El snack perfecto para tus reuniones.',
+                image: 'images/papas_nativas.png'
+            },
+            'DORITOS': {
+                desc: 'Tortillas de maíz súper crujientes con un intenso y adictivo sabor a queso cheddar.',
+                image: 'images/snack_doritos.png'
+            },
+            'TAKIS': {
+                desc: 'Snacks de maíz enrollados, súper crujientes y con un picante intenso que desafía tus límites.',
+                image: 'images/snack_takis.png'
+            },
+            'INKA CHIPS': {
+                desc: 'Papas nativas andinas procesadas artesanalmente con sal de mar y crujido inigualable.',
+                image: 'images/papas_nativas.png'
+            },
+            'FRUTOS SECOS': {
+                desc: 'Mix seleccionado de maní, pasas, almendras y castañas, ideal para acompañar tus tragos.',
+                image: 'images/frutos_secos.png'
+            }
+        };
+
+        const licor_keywords = [
+            'WHISKY', 'RON', 'VODKA', 'PILSEN', 'CERVEZA', 'TEQUILA', 'PISCO', 'VINO', 'BORGOÑA', 
+            'LICOR', 'GIN', 'SMIRNOFF', 'JOHNNIE', 'RED LABEL', 'BLACK LABEL', 'DOUBLE BLACK', 
+            'OLD TIMES', 'CARTAVIO', 'JAGERMEISTER', 'FERNET', 'TRES PLUMAS', 'CAMPARI', 'CHIVAS', 
+            'JACK DANIEL', 'HEINEKEN', 'TRAGOS', 'BACARDI', 'BACCARDI', 'CORONA', 'CUSQUEÑA', 'CRISTAL', 
+            'TRAPICHE', 'MISIONES DE RENGO', 'VIÑA', 'SANTIAGO QUEIROLO', 'SABORES DEL VALLE', 
+            'PULPA', 'VERMOUTH', 'ANIS', 'AMARETTO', 'PISCO SOUR', 'SOUR', 'JOHNY WALKER', 'CHAMPAGNE',
+            'SPARKLING', 'SHERRY', 'SOPRA', 'SAU RUS', 'BOUTIQUE', 'FINCA', 'DON VALENTIN', 'SANGTRIA',
+            'SANGRIA', 'VODKA', 'GINEBRA', 'APEROL', 'MALIBU', 'PISCO', 'TABERNERO', 'CASILLERO DEL DIABLO'
         ];
 
-        // REGISTRAR PLUGIN SCROLLTRIGGER DE GSAP
-        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-            gsap.registerPlugin(ScrollTrigger);
+        const bebida_keywords = [
+            'COCA COLA', 'INCA KOLA', 'FANTA', 'SPRITE', 'PEPSI', 'AGUA', 'SAN LUIS', 'SAN MATEO', 
+            'CIELO', 'POWER ADE', 'SPARKLING', 'FRUGOS', 'VOLT', 'RED BULL', 'GATORADE', 'MILKIS', 
+            'RAMUNE', 'KATO', 'YOGURT', 'GLORIA', 'LECHE', 'JUGO', 'TE CON LECHE', 'CICI', 'PULP', 
+            'MONSTER', 'SODA', 'BEBIDA', 'ADEP', 'AD ADE', 'SCHWEPPES'
+        ];
+
+        const snack_keywords = [
+            'PAPAS', 'LAYS', 'DORITOS', 'TOR TEES', 'SNAXX', 'TIYAPUY', 'TAKIS', 'INKA CHIPS', 
+            'CHEETOS', 'CHISITO', 'PIQUEO', 'MANI', 'FRUTOS SECOS', 'GOMITAS', 'CHOCOLATE', 'SUBLIME', 
+            'PRINCESA', 'TRENTO', 'CASINO', 'GLACITAS', 'PICARAS', 'GALLETA', 'MARGARITA', 'TRIDENT', 
+            'CHICLE', 'DULCE', 'PALETA', 'MARSHMALLOW', 'ALMENDRAS', 'PISTACHOS', 'CRAKERS', 'CLUB SOCIAL',
+            'CRUNCH', 'OREO', 'RITZ', 'BIMBO', 'PAN', 'KEKE', 'DONOFRIO', 'HELADO', 'PEZIDURI', 
+            'SORPRESA', 'CHOCO', 'GOMA', 'TURRON', 'MENTOS', 'HALLS', 'FREEGELLS'
+        ];
+
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1WeyilhcWeYJowJ7DJxY2-yBGELaw5FR7IthUIdM96xw/export?format=csv&gid=403687409";
+
+        // Colección principal de productos
+        let products = [...staticCarnes];
+
+        // Límites de vista inicial por categoría
+        let visibleLimits = {
+            licores: 8,
+            bebidas: 8,
+            snacks: 8,
+            carnes: 100
+        };
+
+        // Generador dinámico de marcador SVG
+        function generateSVGPlaceholder(category, name) {
+            let bgGradient = "";
+            let iconSvg = "";
+            let glowColor = "";
+            
+            if (category === "licores") {
+                bgGradient = "linear-gradient(135deg, #2a080d 0%, #0d0608 100%)";
+                glowColor = "hsl(355, 85%, 55%)";
+                iconSvg = `<path d="M10 2h4v3h-4z M12 5c-1.66 0-3 1.34-3 3v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V8c0-1.66-1.34-3-3-3z M11 9h2v2h-2z M11 13h2v2h-2z" fill="${glowColor}" filter="drop-shadow(0 0 8px ${glowColor})"/>`;
+            } else if (category === "bebidas") {
+                bgGradient = "linear-gradient(135deg, #08212a 0%, #060e11 100%)";
+                glowColor = "hsl(180, 85%, 45%)";
+                iconSvg = `<path d="M6 2h12v2H6zm2 4h8l-1.5 14h-5L8 6zm3 4h2v6h-2z" fill="${glowColor}" filter="drop-shadow(0 0 8px ${glowColor})"/>`;
+            } else { // snacks
+                bgGradient = "linear-gradient(135deg, #2a1b08 0%, #110c06 100%)";
+                glowColor = "hsl(35, 90%, 55%)";
+                iconSvg = `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-3.5 6c.83 0 1.5.67 1.5 1.5S9.33 11 8.5 11 7 10.33 7 9.5 7.67 8 8.5 8zm.5 8c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm6-5c.83 0 1.5.67 1.5 1.5S17.33 14 16.5 14 15 13.33 15 12.5 15.67 11 16.5 11z" fill="${glowColor}" filter="drop-shadow(0 0 8px ${glowColor})"/>`;
+            }
+            
+            const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%" style="background:${bgGradient};display:flex;align-items:center;justify-content:center;">
+                <rect width="24" height="24" fill="none"/>
+                <g transform="scale(0.5) translate(12, 12)">
+                    ${iconSvg}
+                </g>
+            </svg>`;
+            
+            return `data:image/svg+xml;utf8,${encodeURIComponent(svgStr)}`;
         }
 
-        // ESTADO DEL CARRITO Y GPS
-        let cart = {};
-        let capturedGpsLink = "";
-        window.isCartOpen = false;
-
-        // Función de renderizado seguro de iconos de Lucide
-        function safeCreateIcons() {
-            try {
-                if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                    lucide.createIcons();
+        // Lector y analizador de CSV
+        function parseCSV(text) {
+            const lines = text.split(/\r\n|\n/);
+            if (lines.length === 0) return [];
+            
+            let headerIndex = -1;
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes("CODIGO BARRAS") && lines[i].includes("PRODUCTO")) {
+                    headerIndex = i;
+                    break;
                 }
-            } catch (e) {
-                console.warn("Lucide icons failed to render:", e);
+            }
+            
+            if (headerIndex === -1) return [];
+            
+            const headers = parseCSVLine(lines[headerIndex]);
+            const results = [];
+            
+            for (let i = headerIndex + 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const values = parseCSVLine(line);
+                if (values.length < headers.length) continue;
+                
+                const row = {};
+                for (let j = 0; j < headers.length; j++) {
+                    row[headers[j]] = values[j];
+                }
+                results.push(row);
+            }
+            return results;
+        }
+
+        function parseCSVLine(line) {
+            const values = [];
+            let curVal = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const c = line[i];
+                if (c === '"') {
+                    inQuotes = !inQuotes;
+                } else if (c === ',' && !inQuotes) {
+                    values.push(curVal.trim().replace(/^"|"$/g, ''));
+                    curVal = '';
+                } else {
+                    curVal += c;
+                }
+            }
+            values.push(curVal.trim().replace(/^"|"$/g, ''));
+            return values;
+        }
+
+        // Carga de productos desde Google Sheets
+        async function loadGoogleSheetsProducts() {
+            try {
+                const response = await fetch(SHEET_CSV_URL);
+                if (!response.ok) throw new Error("No se pudo descargar el catálogo.");
+                const text = await response.text();
+                
+                const sheetRows = parseCSV(text);
+                const parsedProducts = [];
+                const seenIds = new Set();
+                
+                sheetRows.forEach(row => {
+                    const name = row['PRODUCTO'];
+                    const nameUpper = (name || '').toUpperCase();
+                    const barcode = row['CODIGO BARRAS'];
+                    const price_str = row['PRECIO VENTA'];
+                    const stock_str = row['STOCK FISICO'] || row['STOCK SISTEMA'] || '0';
+                    
+                    if (!name || nameUpper.includes("DELIVERY") || nameUpper.includes("CONTOMETRO")) return;
+                    
+                    const price = parseFloat(price_str);
+                    const stock = parseFloat(stock_str);
+                    
+                    if (isNaN(price) || price <= 0 || isNaN(stock) || stock <= 0) return;
+                    
+                    let category = '';
+                    const isLicor = licor_keywords.some(kw => nameUpper.includes(kw));
+                    const isBebida = bebida_keywords.some(kw => nameUpper.includes(kw));
+                    const isSnack = snack_keywords.some(kw => nameUpper.includes(kw));
+                    
+                    if (isLicor) {
+                        category = 'licores';
+                    } else if (isBebida) {
+                        category = 'bebidas';
+                    } else if (isSnack) {
+                        category = 'snacks';
+                    } else {
+                        return; // Omitir no clasificados
+                    }
+                    
+                    const id = barcode || `PROD-${Math.random().toString(36).substr(2, 9)}`;
+                    if (seenIds.has(id)) return;
+                    seenIds.add(id);
+                    
+                    let desc = '';
+                    let image = '';
+                    let badge = '';
+                    
+                    // Buscar detalles de la marca
+                    for (const brand in BRAND_DETAILS) {
+                        if (nameUpper.includes(brand)) {
+                            desc = BRAND_DETAILS[brand].desc;
+                            image = BRAND_DETAILS[brand].image;
+                            break;
+                        }
+                    }
+                    
+                    if (!image) {
+                        image = generateSVGPlaceholder(category, name);
+                    }
+                    
+                    if (stock < 5) {
+                        badge = "¡Pocas unidades!";
+                    }
+                    
+                    parsedProducts.push({
+                        id: id,
+                        name: name,
+                        price: price,
+                        category: category,
+                        image: image,
+                        desc: desc,
+                        badge: badge,
+                        stock: stock
+                    });
+                });
+                
+                products = [...parsedProducts, ...staticCarnes];
+                hideSkeletons();
+                renderProducts();
+            } catch (error) {
+                console.error("Error cargando productos de Google Sheets:", error);
+                hideSkeletons();
+                products = [...staticCarnes];
+                renderProducts();
+            }
+        }
+
+        function hideSkeletons() {
+            const categories = ['licores', 'bebidas', 'snacks'];
+            categories.forEach(cat => {
+                const sk = document.getElementById(`skeleton-${cat}`);
+                if (sk) sk.style.display = 'none';
+            });
+        }
+
+        function renderProductCard(container, product) {
+            const cardHtml = `
+                <div class="product-card ${product.featured ? 'featured' : ''}" data-id="${product.id}">
+                    <div class="product-image-container">
+                        ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
+                        <img src="${product.image}" alt="${product.name}" class="product-image" loading="lazy">
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-info">
+                            <div class="product-category">${product.category}</div>
+                            <div class="product-title">${product.name}</div>
+                            <div class="product-id">ID: ${product.id}</div>
+                            ${product.desc ? `<p class="product-desc">${product.desc}</p>` : ''}
+                        </div>
+                        <div class="product-footer">
+                            <div class="product-price">${product.price.toFixed(2)}</div>
+                            <div class="quantity-controls">
+                                <button class="qty-btn" onclick="updateQty('${product.id}', -1); event.stopPropagation();" aria-label="Disminuir cantidad">
+                                    <i data-lucide="minus" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <span class="qty-value" id="qty-${product.id}">0</span>
+                                <button class="qty-btn" onclick="updateQty('${product.id}', 1); event.stopPropagation();" aria-label="Aumentar cantidad">
+                                    <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', cardHtml);
+        }
+
+        function syncQuantityControls() {
+            document.querySelectorAll('.qty-value').forEach(el => {
+                el.innerText = '0';
+            });
+            Object.keys(cart).forEach(id => {
+                const qtyElement = document.getElementById(`qty-${id}`);
+                if (qtyElement) {
+                    qtyElement.innerText = cart[id];
+                }
+            });
+        }
+
+        function animateCards() {
+            if (typeof gsap === 'undefined') return;
+            
+            ScrollTrigger.getAll().forEach(trigger => {
+                if (trigger.trigger && trigger.trigger.classList && trigger.trigger.classList.contains('product-card')) {
+                    trigger.kill();
+                }
+            });
+            
+            gsap.utils.toArray('.product-card').forEach(card => {
+                gsap.fromTo(card, 
+                    { y: 30, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.6,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 95%",
+                            toggleActions: "play none none none"
+                        }
+                    }
+                );
+            });
+            
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (!isTouchDevice && window.innerWidth > 768) {
+                document.querySelectorAll('.product-card').forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        const rotateX = -((y / rect.height) - 0.5) * 16;
+                        const rotateY = ((x / rect.width) - 0.5) * 16;
+                        
+                        gsap.to(card, {
+                            rotationX: rotateX,
+                            rotationY: rotateY,
+                            transformPerspective: 1000,
+                            ease: "power2.out",
+                            duration: 0.3,
+                            boxShadow: "0 15px 30px rgba(239, 68, 68, 0.2), var(--shadow-neon)",
+                            borderColor: "var(--primary)"
+                        });
+                    });
+                    
+                    card.addEventListener('mouseleave', () => {
+                        gsap.to(card, {
+                            rotationX: 0,
+                            rotationY: 0,
+                            ease: "power3.out",
+                            duration: 0.6,
+                            boxShadow: "none",
+                            borderColor: "var(--glass-border)"
+                        });
+                    });
+                });
             }
         }
 
         // RENDERIZAR PRODUCTOS EN EL DOM
-        function renderProducts() {
-            products.forEach(product => {
-                const grid = document.getElementById(`grid-${product.category}`);
-                if (!grid) return;
-
-                const cardHtml = `
-                    <div class="product-card ${product.featured ? 'featured' : ''}">
-                        <div class="product-image-container">
-                            ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
-                            <img src="${product.image}" alt="${product.name}" class="product-image" loading="lazy">
-                        </div>
-                        <div class="product-card-body">
-                            <div class="product-info">
-                                <div class="product-category">${product.category}</div>
-                                <div class="product-title">${product.name}</div>
-                                <div class="product-id">ID: ${product.id}</div>
-                                ${product.desc ? `<p class="product-desc">${product.desc}</p>` : ''}
-                            </div>
-                            <div class="product-footer">
-                                <div class="product-price">${product.price.toFixed(2)}</div>
-                                <div class="quantity-controls">
-                                    <button class="qty-btn" onclick="updateQty('${product.id}', -1); event.stopPropagation();" aria-label="Disminuir cantidad">
-                                        <i data-lucide="minus" style="width: 14px; height: 14px;"></i>
-                                    </button>
-                                    <span class="qty-value" id="qty-${product.id}">0</span>
-                                    <button class="qty-btn" onclick="updateQty('${product.id}', 1); event.stopPropagation();" aria-label="Aumentar cantidad">
-                                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                grid.innerHTML += cardHtml;
-            });
-            safeCreateIcons();
-
-            // EJECUTAR REVEAL DE TARJETAS AL HACER SCROLL CON GSAP
-            setTimeout(() => {
-                if (typeof gsap === 'undefined') return;
-
-                // Animación de cards
-                gsap.utils.toArray('.product-card').forEach(card => {
-                    gsap.fromTo(card, 
-                        { y: 50, opacity: 0 },
-                        {
-                            y: 0,
-                            opacity: 1,
-                            duration: 0.8,
-                            ease: "power2.out",
-                            scrollTrigger: {
-                                trigger: card,
-                                start: "top 92%",
-                                toggleActions: "play none none none"
-                            }
-                        }
-                    );
-                });
-
-                // Dibujar la línea neón de las secciones al hacer scroll y animar iconos
-                gsap.utils.toArray('.section-title').forEach(title => {
-                    const line = title.querySelector('.section-title-line');
-                    const icon = title.querySelector('i');
-                    
-                    gsap.timeline({
-                        scrollTrigger: {
-                            trigger: title,
-                            start: "top 90%",
-                            toggleActions: "play none none none"
-                        }
-                    })
-                    .fromTo(line, { width: "0%" }, { width: "80%", duration: 1.2, ease: "power3.out" })
-                    .fromTo(icon, { rotation: -30, scale: 0.7 }, { rotation: 0, scale: 1, duration: 0.6, ease: "back.out(2)" }, "-=0.8");
-                });
-
-                // Registrar efectos de Hover 3D en las tarjetas (Desktop only)
-                const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-                if (!isTouchDevice && window.innerWidth > 768) {
-                    document.querySelectorAll('.product-card').forEach(card => {
-                        card.addEventListener('mousemove', (e) => {
-                            const rect = card.getBoundingClientRect();
-                            const x = e.clientX - rect.left;
-                            const y = e.clientY - rect.top;
-                            const rotateX = -((y / rect.height) - 0.5) * 16;
-                            const rotateY = ((x / rect.width) - 0.5) * 16;
-                            
-                            gsap.to(card, {
-                                rotationX: rotateX,
-                                rotationY: rotateY,
-                                transformPerspective: 1000,
-                                ease: "power2.out",
-                                duration: 0.3,
-                                boxShadow: "0 15px 30px rgba(239, 68, 68, 0.2), var(--shadow-neon)",
-                                borderColor: "var(--primary)"
-                            });
-                        });
-                        
-                        card.addEventListener('mouseleave', () => {
-                            gsap.to(card, {
-                                rotationX: 0,
-                                rotationY: 0,
-                                ease: "power3.out",
-                                duration: 0.6,
-                                boxShadow: "none",
-                                borderColor: "var(--glass-border)"
-                            });
-                        });
-                    });
+        window.renderProducts = function(filteredList = null) {
+            const isSearching = filteredList !== null;
+            const categories = ['licores', 'bebidas', 'snacks', 'carnes'];
+            
+            categories.forEach(cat => {
+                const grid = document.getElementById(`grid-${cat}`);
+                if (grid) {
+                    const cards = grid.querySelectorAll('.product-card');
+                    cards.forEach(card => card.remove());
                 }
-            }, 100);
-        }
+            });
+            
+            const searchGrid = document.getElementById('grid-search-results');
+            if (searchGrid) searchGrid.innerHTML = '';
+            
+            if (isSearching) {
+                categories.forEach(cat => {
+                    const section = document.getElementById(cat);
+                    if (section) section.style.display = 'none';
+                });
+                
+                const searchSection = document.getElementById('search-results');
+                if (searchSection) searchSection.style.display = 'block';
+                
+                if (filteredList.length === 0) {
+                    searchGrid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                            <i data-lucide="search-code" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <p style="font-size: 1.1rem; font-weight: 600;">No se encontraron productos</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Prueba con otros términos de búsqueda.</p>
+                        </div>
+                    `;
+                    safeCreateIcons();
+                    return;
+                }
+                
+                filteredList.forEach(product => {
+                    renderProductCard(searchGrid, product);
+                });
+            } else {
+                categories.forEach(cat => {
+                    const section = document.getElementById(cat);
+                    if (section) section.style.display = 'block';
+                });
+                
+                const searchSection = document.getElementById('search-results');
+                if (searchSection) searchSection.style.display = 'none';
+                
+                categories.forEach(cat => {
+                    const grid = document.getElementById(`grid-${cat}`);
+                    if (!grid) return;
+                    
+                    const catProducts = products.filter(p => p.category === cat);
+                    const limit = visibleLimits[cat];
+                    const visibleProducts = catProducts.slice(0, limit);
+                    
+                    visibleProducts.forEach(product => {
+                        renderProductCard(grid, product);
+                    });
+                    
+                    const moreContainer = document.getElementById(`more-container-${cat}`);
+                    if (moreContainer) {
+                        if (catProducts.length > limit) {
+                            moreContainer.style.display = 'flex';
+                            moreContainer.querySelector('.btn-show-more').innerHTML = `
+                                Ver más ${cat} (${catProducts.length - limit})
+                                <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
+                            `;
+                        } else {
+                            moreContainer.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            safeCreateIcons();
+            syncQuantityControls();
+            
+            setTimeout(() => {
+                animateCards();
+            }, 50);
+        };
+
+        window.showAllCategory = function(category) {
+            visibleLimits[category] = 10000;
+            renderProducts();
+        };
+
+        window.clearSearchInput = function() {
+            const searchInput = document.getElementById('inventory-search');
+            const clearBtn = document.getElementById('clear-search');
+            if (searchInput) {
+                searchInput.value = '';
+                if (clearBtn) clearBtn.style.display = 'none';
+                renderProducts();
+            }
+        };
+
+        // Escuchar cambios de búsqueda
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('inventory-search');
+            const clearBtn = document.getElementById('clear-search');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim().toUpperCase();
+                    if (query.length > 0) {
+                        if (clearBtn) clearBtn.style.display = 'flex';
+                        const filtered = products.filter(p => {
+                            return p.name.toUpperCase().includes(query) || 
+                                   p.category.toUpperCase().includes(query) || 
+                                   p.id.toUpperCase().includes(query);
+                        });
+                        renderProducts(filtered);
+                    } else {
+                        if (clearBtn) clearBtn.style.display = 'none';
+                        renderProducts();
+                    }
+                });
+            }
+        });
 
         // ANIMACIÓN DE ENTRADA INICIAL CON GSAP (ABOVE THE FOLD REVEAL)
         function playInitialGSAPAnimations() {
@@ -2206,7 +2700,7 @@
 
         // RENDERIZAR EN EL LOGIN DE LA PÁGINA
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
+            loadGoogleSheetsProducts();
             playInitialGSAPAnimations();
             initGlobalInteractions();
             initParticleBackground();
