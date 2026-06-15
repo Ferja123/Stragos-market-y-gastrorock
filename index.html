@@ -1547,13 +1547,15 @@
                 image: "images/hamburguesa_angus.png" 
             }
         ];        const BRAND_DETAILS = {
+            // ── WHISKY & SPIRITS ──────────────────────────────────────────────
+            'COMBO RED LABEL + EVERVESS 1.5 + HIELO': {
+                desc: '🏆 Combo Mundialista: Johnnie Walker Red Label + Evervess Ginger Ale 1.5L + Bolsa de Hielo. ¡Disfruta los partidos!',
+                image: 'images/combo_mundial.png',
+                badge: '🏆 Combo Mundial'
+            },
             'JOHNNIE WALKER': {
                 desc: 'El whisky escocés más vendido del mundo. Mezcla audaz de whiskies ahumados y picantes.',
-                image: 'images/whisky_red_label.png'
-            },
-            'COMBO RED LABEL + EVERVESS 1.5 + HIELO': {
-                desc: 'Combo Mundialista: Botella de Johnnie Walker Red Label + Evervess Ginger Ale 1.5L + Bolsa de Hielo. Perfecto para disfrutar los partidos.',
-                image: 'images/whisky_red_label.png'
+                image: 'https://images.openfoodfacts.org/images/products/509/987/308/9798/front_en.3.400.jpg'
             },
             'RED LABEL': {
                 desc: 'Whisky escocés Johnnie Walker Red Label, vibrante, ahumado y con notas picantes.',
@@ -1563,42 +1565,58 @@
                 desc: 'Whisky escocés Johnnie Walker Black Label de 12 años. Notas de frutos secos, vainilla y un ahumado distinguido.',
                 image: 'images/whisky_black_label.png'
             },
+            'DOUBLE BLACK': {
+                desc: 'Whisky escocés Johnnie Walker Double Black, intensidad máxima con doble ahumado.',
+                image: 'images/whisky_black_label.png'
+            },
             'OLD PARR': {
                 desc: 'Whisky escocés clásico de sabor suave, afrutado y con una nota profunda de roble.',
                 image: 'images/whisky_old_parr.png'
             },
+            'JACK DANIEL': {
+                desc: 'Tennessee Whiskey. Destilado gota a gota a través de carbón de arce en Lynchburg, Tennessee.',
+                image: 'https://images.openfoodfacts.org/images/products/509/987/308/9798/front_en.3.400.jpg'
+            },
+            'CHIVAS': {
+                desc: 'Whisky escocés premium Chivas Regal 12 años. Suave, rico y complejo con notas de miel y frutas.',
+                image: 'https://images.openfoodfacts.org/images/products/008/043/240/0432/front_en.24.400.jpg'
+            },
+            // ── RON & AGUARDIENTE ─────────────────────────────────────────────
             'CARTAVIO': {
                 desc: 'Ron clásico elaborado en el norte del Perú, con barricas seleccionadas que le otorgan un cuerpo balanceado.',
                 image: 'images/ron_cartavio_premium.png'
             },
             'FLOR DE CAÑA': {
                 desc: 'Ron nicaragüense ultra premium envejecido de forma natural, de sabor excepcionalmente suave y elegante.',
-                image: 'images/ron_cartavio_premium.png'
+                image: 'https://images.openfoodfacts.org/images/products/002/696/485/2745/front_fr.3.400.jpg'
             },
-            'PILSEN': {
-                desc: 'La cerveza de la verdadera amistad en el Perú. Refrescante, helada y con el lúpulo perfecto.',
-                image: 'images/cerveza_pilsen.png'
+            'BACARDI': {
+                desc: 'Ron blanco Bacardi Carta Blanca, ideal para cócteles clásicos y combinados refrescantes.',
+                image: 'https://images.openfoodfacts.org/images/products/501/067/701/2850/front_it.9.400.jpg'
             },
-            'CORONA': {
-                desc: 'Cerveza mexicana premium suave y refrescante, perfecta para disfrutar helada con una rodaja de limón.',
-                image: 'images/cerveza_corona.png'
+            'BACCARDI': {
+                desc: 'Ron blanco Bacardi Carta Blanca, ideal para cócteles clásicos y combinados refrescantes.',
+                image: 'https://images.openfoodfacts.org/images/products/501/067/701/2850/front_it.9.400.jpg'
             },
-            'CUSQUEÑA': {
-                desc: 'Cerveza peruana premium de gran cuerpo elaborada con 100% pura malta de cebada y lúpulos selectos.',
-                image: 'images/cerveza_cusquena.png'
-            },
-            'CRISTAL': {
-                desc: 'La cerveza del Perú, refrescante de cuerpo equilibrado para celebrar y disfrutar con los amigos.',
-                image: 'images/cerveza_cristal.png'
-            },
+            // ── VODKA ─────────────────────────────────────────────────────────
             'SMIRNOFF': {
                 desc: 'Vodka triple destilado de pureza extraordinaria. Ideal para combinados y coctelería.',
-                image: 'images/vodka_smirnoff.png'
+                image: 'https://images.openfoodfacts.org/images/products/541/031/667/1118/front_en.34.400.jpg'
             },
+            'ABSOLUT': {
+                desc: 'Vodka sueco de carácter único, elaborado en Åhus, con trigo invernal y agua pura de manantial.',
+                image: 'https://images.openfoodfacts.org/images/products/731/204/001/7683/front_en.31.400.jpg'
+            },
+            // ── TEQUILA ───────────────────────────────────────────────────────
             'TEQUILA': {
                 desc: 'Tequila de gran cuerpo y sabor tradicional elaborado con agave azul seleccionado.',
                 image: 'images/tequila_bottle.png'
             },
+            'JOSE CUERVO': {
+                desc: 'Tequila José Cuervo, el más famoso del mundo. Dorado, suave y con el auténtico sabor de México.',
+                image: 'images/tequila_bottle.png'
+            },
+            // ── PISCO ─────────────────────────────────────────────────────────
             '4 GALLOS': {
                 desc: 'Pisco premium peruano de uvas seleccionadas de Ica. Mosto verde, de aroma y cuerpo excepcionales.',
                 image: 'images/pisco_peruano.png'
@@ -1611,29 +1629,69 @@
                 desc: 'Pisco puro peruano de aroma fino y sabor balanceado, ideal para preparar el clásico Pisco Sour.',
                 image: 'images/pisco_peruano.png'
             },
+            // ── CERVEZA ───────────────────────────────────────────────────────
+            'PILSEN': {
+                desc: 'La cerveza de la verdadera amistad en el Perú. Refrescante, helada y con el lúpulo perfecto.',
+                image: 'images/cerveza_pilsen.png'
+            },
+            'CORONA': {
+                desc: 'Cerveza mexicana premium suave y refrescante, perfecta para disfrutar helada con una rodaja de limón.',
+                image: 'https://images.openfoodfacts.org/images/products/000/007/504/1670/front_en.6.400.jpg'
+            },
+            'CUSQUEÑA': {
+                desc: 'Cerveza peruana premium de gran cuerpo elaborada con 100% pura malta de cebada y lúpulos selectos.',
+                image: 'images/cerveza_cusquena.png'
+            },
+            'CRISTAL': {
+                desc: 'La cerveza del Perú, refrescante de cuerpo equilibrado para celebrar y disfrutar con los amigos.',
+                image: 'images/cerveza_cristal.png'
+            },
+            'HEINEKEN': {
+                desc: 'Cerveza holandesa premium de carácter único. Refrescante, de sabor suave y equilibrado.',
+                image: 'https://images.openfoodfacts.org/images/products/000/007/893/6683/front_pt.22.400.jpg'
+            },
+            // ── LICORES VARIOS ────────────────────────────────────────────────
+            'JAGERMEISTER': {
+                desc: 'Licor alemán de hierbas elaborado con una receta secreta de 56 botánicos. Se sirve helado.',
+                image: 'https://images.openfoodfacts.org/images/products/406/770/001/3019/front_en.11.400.jpg'
+            },
+            'FERNET': {
+                desc: 'Amaro italiano de hierbas con sabor intenso y amargo. El clásico trago del gastrónomo.',
+                image: 'images/licor_jagermeister.png'
+            },
+            // ── VINOS ─────────────────────────────────────────────────────────
             'BORGOÑA': {
                 desc: 'Vino peruano dulce y afrutado elaborado con uvas Borgoña. Perfecto para cualquier ocasión.',
                 image: 'images/vino_borgona.png'
             },
             'ROSE': {
                 desc: 'Vino rosado semi-seco de notas frutales y florales, refrescante y con un final elegante.',
-                image: 'images/combo_san_juan_old_times.png'
+                image: 'images/vino_borgona.png'
             },
             'ROSÉ': {
                 desc: 'Vino rosado semi-seco de notas frutales y florales, refrescante y con un final elegante.',
-                image: 'images/combo_san_juan_old_times.png'
+                image: 'images/vino_borgona.png'
             },
-            'JAGERMEISTER': {
-                desc: 'Licor alemán de hierbas elaborado con una receta secreta de 56 botánicos. Se sirve helado.',
-                image: 'images/licor_jagermeister.png'
-            },
+            // ── GASEOSAS & BEBIDAS ────────────────────────────────────────────
             'COCA COLA': {
-                desc: 'La bebida refrescante más famosa del mundo. Sabor original y burbujeante, lista para acompañar tus comidas.',
-                image: 'images/coca_cola.png'
+                desc: 'La bebida refrescante más famosa del mundo. Sabor original y burbujeante.',
+                image: 'https://images.openfoodfacts.org/images/products/544/900/000/0439/front_en.292.400.jpg'
             },
             'INCA KOLA': {
                 desc: 'La bebida de sabor nacional. Con su inconfundible color dorado y sabor único que combina con todo.',
-                image: 'images/inca_kola.png'
+                image: 'https://images.openfoodfacts.org/images/products/775/023/600/0239/front_es.13.400.jpg'
+            },
+            'EVERVESS': {
+                desc: 'Ginger Ale refrescante de sabor suave con jengibre, perfecto para cócteles y tragos.',
+                image: 'https://images.openfoodfacts.org/images/products/001/200/080/6759/front_en.6.400.jpg'
+            },
+            'SPRITE': {
+                desc: 'Bebida gaseosa de limón y lima, refrescante y sin cafeína. El complemento ideal para tus comidas.',
+                image: 'https://images.openfoodfacts.org/images/products/500/011/265/1898/front_en.15.400.jpg'
+            },
+            'SCHWEPPES': {
+                desc: 'Agua tónica clásica Schweppes, perfecta para preparar los mejores combinados con gin o vodka.',
+                image: 'images/agua_gas.png'
             },
             'SAN LUIS': {
                 desc: 'Agua de mesa pura y ligera, ideal para hidratarte en cualquier momento del día.',
@@ -1643,25 +1701,31 @@
                 desc: 'Agua mineral de manantial filtrada de manera natural a más de 3000 metros de altura.',
                 image: 'images/agua_gas.png'
             },
+            // ── ENERGÉTICAS ───────────────────────────────────────────────────
             'RED BULL': {
                 desc: 'Bebida energizante que revitaliza cuerpo y mente, ideal para tus largas jornadas y noches rockeras.',
-                image: 'images/red_bull.png'
+                image: 'https://images.openfoodfacts.org/images/products/900/249/020/5973/front_en.104.400.jpg'
             },
             'VOLT': {
                 desc: 'Bebida energizante de alta potencia para darte el impulso extra que necesitas en tu día.',
                 image: 'images/red_bull.png'
             },
+            'MONSTER': {
+                desc: 'Bebida energizante Monster Energy, para los que viven al límite.',
+                image: 'images/red_bull.png'
+            },
+            // ── SNACKS ────────────────────────────────────────────────────────
+            'DORITOS': {
+                desc: 'Tortillas de maíz súper crujientes con un intenso y adictivo sabor a queso cheddar.',
+                image: 'https://images.openfoodfacts.org/images/products/871/039/816/1987/front_en.72.400.jpg'
+            },
             'LAYS': {
                 desc: 'Papas fritas clásicas, crujientes y saladas. El snack perfecto para tus reuniones.',
-                image: 'images/papas_nativas.png'
+                image: 'https://images.openfoodfacts.org/images/products/780/200/000/2564/front_en.3.400.jpg'
             },
             'LAY\'S': {
                 desc: 'Papas fritas clásicas, crujientes y saladas. El snack perfecto para tus reuniones.',
-                image: 'images/papas_nativas.png'
-            },
-            'DORITOS': {
-                desc: 'Tortillas de maíz súper crujientes con un intenso y adictivo sabor a queso cheddar.',
-                image: 'images/snack_doritos.png'
+                image: 'https://images.openfoodfacts.org/images/products/780/200/000/2564/front_en.3.400.jpg'
             },
             'TAKIS': {
                 desc: 'Snacks de maíz enrollados, súper crujientes y con un picante intenso que desafía tus límites.',
